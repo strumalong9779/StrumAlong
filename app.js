@@ -2,7 +2,7 @@
 // Listens to the guitar's Bluetooth/USB MIDI, works out which chord each strum was and when,
 // lights the frets, plays the sound, and shows the song, the fret to press and timing feedback.
 'use strict';
-const APP_VERSION = '1.2.0';   // bump this for every release, and add a line to CHANGELOG.md
+const APP_VERSION = '1.2.1';   // bump this for every release, and add a line to CHANGELOG.md
 
 // ---------- constants ----------
 const FRET_COLORS = { 1:'#34c759', 2:'#2f6fe0', 3:'#e5443b', 4:'#9b59e0', 5:'#62cdf5', 6:'#f5d33d', 7:'#f26fb4' };
@@ -964,23 +964,25 @@ async function applySongLayout() {
   if (L.sent) L.sent = L.sent.map(() => null);
   renderAll();
 }
-// ---------- Restore the guitar ----------
+// ---------- Chord reset: put the guitar's factory chords back ----------
 // The song layout StrumAlong writes stays on the guitar after it is switched off and on (tested 24 Nov 2026),
 // so before going back to the AeroBand app or playing on its own, put back the factory layout:
 // C Dm Em F G Am Bdim (byte-identical to the official app's factory layout), Easy Chord on,
 // the guitar's own fret colours, then disconnect. Disconnecting (clicking "Connected") does the same.
 const FACTORY_EC = { 1: 'C', 2: 'Dm', 3: 'Em', 4: 'F', 5: 'G', 6: 'Am', 7: 'Bdim' };
-async function restoreGuitar() {
+async function chordReset() {
   if (!L.ch) { showMsg('Connect to the guitar first', 2500); return; }
   if (L.restoring) return;
-  showMsg('Restoring guitar…', 9000);
-  const ok = await programEasyChord(FACTORY_EC);
+  showMsg('Resetting chords…', 12000);
+  let ok = await programEasyChord(FACTORY_EC);
+  if (ok) { await sleep(400); ok = await programEasyChord(FACTORY_EC); }   // twice: the guitar sometimes drops a command
   if (ok) await setEasyChord(true);
+  if (ok) await sleep(2000);   // give the guitar time to save before disconnecting (tested on a real guitar, 24 Nov 2026)
   hideMsg();
-  if (!ok) { showMsg('Restore failed – try again', 2500); return; }
+  if (!ok) { showMsg('Chord reset failed – try again', 2500); return; }
   L.programmed = null;
   L.restoring = true; renderLights();      // lights back to the guitar's own colours, then disconnect
-  showMsg('Guitar restored ✓', 2500);
+  showMsg('Chords reset ✓', 2500);
 }
 async function setClassicMode() {
   for (const c of CLASSIC_MODE_CMDS) { await L.ch.writeValueWithoutResponse(guitarFrame(c)); await new Promise(r => setTimeout(r, LED_GAP_MS)); }
@@ -1080,7 +1082,7 @@ function onBleMidi(e) {
   }
 }
 async function connectLights() {
-  if (L.ch) { restoreGuitar(); return; }   // "Disconnect": put the guitar back to factory, then disconnect
+  if (L.ch) { chordReset(); return; }   // "Disconnect": put the guitar back to factory, then disconnect
   if (!navigator.bluetooth) { showMsg('Use Chrome for lights', 1500); return; }
   try {
     const dev = await navigator.bluetooth.requestDevice({ filters: [{ services: [BLE_MIDI_SERVICE] }] });
@@ -1240,7 +1242,7 @@ window.addEventListener('pointerdown', unlock); window.addEventListener('keydown
 $('tempo').oninput = e => setTempo(+e.target.value);
 $('spb').onchange = e => { S.spb = +e.target.value; store.set('spb', S.spb); resetRun(); };
 $('click').onchange = e => { S.click = e.target.checked; store.set('click', S.click); };
-$('restore-btn').onclick = () => restoreGuitar();
+$('chord-reset-btn').onclick = () => chordReset();
 $('fret-layout').value = S.fretLayout;
 $('fret-layout').onchange = e => { S.fretLayout = e.target.value; store.set('fretLayout', S.fretLayout); applySongLayout(); };
 $('strum-level').value = S.strumLevel;

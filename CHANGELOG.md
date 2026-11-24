@@ -3,8 +3,11 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.2.1 — November 2026
+- Chord reset made reliable: sends the factory layout twice and waits 2 seconds before disconnecting, so the guitar saves it (verified on a real guitar through a power cycle)
+
 ## 1.2.0 — November 2026
-- New **↺ Restore guitar & disconnect** (Settings, or click **💡 Connected**): puts back the factory chords (C Dm Em F G Am Bdim), Easy Chord on and the guitar's own light colours, then disconnects. Needed because the song's chord layout stays on the guitar after it is switched off.
+- New **↺ Chord reset & disconnect** (Settings, or click **💡 Connected**): puts back the factory chords (C Dm Em F G Am Bdim), Easy Chord on and the guitar's own light colours, then disconnects. Needed because the song's chord layout stays on the guitar after it is switched off.
 
 ## 1.1.2 — November 2026
 - Project moved to its permanent home: https://github.com/strumalong9779/StrumAlong (web app: https://strumalong9779.github.io/StrumAlong/)
