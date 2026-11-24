@@ -1,0 +1,350 @@
+{
+ "title": "Oh! Susanna",
+ "artist": "Stephen Foster, 1848 (public domain)",
+ "key": "C",
+ "beatsPerBar": 2,
+ "cellBeats": 2,
+ "normalTempo": 110,
+ "easyChord": {
+  "1": "C",
+  "2": "Dm",
+  "3": "Em",
+  "4": "F",
+  "5": "G",
+  "6": "Am",
+  "7": "Bdim"
+ },
+ "notes": "2/4. One cell per bar. Verse then chorus; {a}..{h} come from each verse.",
+ "lines": [
+  [
+   [
+    "C",
+    "{a}"
+   ],
+   [
+    "C",
+    "{b}"
+   ],
+   [
+    "C",
+    "{c}"
+   ],
+   [
+    "G",
+    "{d}"
+   ]
+  ],
+  [
+   [
+    "C",
+    "{e}"
+   ],
+   [
+    "C",
+    "{f}"
+   ],
+   [
+    "G",
+    "{g}"
+   ],
+   [
+    "C",
+    "{h}"
+   ]
+  ],
+  [
+   [
+    "F",
+    "Oh, Su-"
+   ],
+   [
+    "F",
+    "san-na, oh"
+   ],
+   [
+    "C",
+    "don't you cry for"
+   ],
+   [
+    "G",
+    "me, for I"
+   ]
+  ],
+  [
+   [
+    "C",
+    "come from Al-a-"
+   ],
+   [
+    "C",
+    "bam-a with my"
+   ],
+   [
+    "G",
+    "ban-jo on my"
+   ],
+   [
+    "C",
+    "knee."
+   ]
+  ]
+ ],
+ "verses": [
+  {
+   "name": "Verse 1",
+   "a": "I come from Al-a-",
+   "b": "bam-a with my",
+   "c": "ban-jo on my",
+   "d": "knee; I'm",
+   "e": "go-in' to Lou-",
+   "f": "'si-an-a, my",
+   "g": "true love for to",
+   "h": "see."
+  },
+  {
+   "name": "Verse 2",
+   "a": "It rained all night the",
+   "b": "day I left, the",
+   "c": "weath-er it was",
+   "d": "dry; the",
+   "e": "sun so hot I",
+   "f": "froze to death; Su-",
+   "g": "san-na, don't you",
+   "h": "cry."
+  },
+  {
+   "name": "Verse 3",
+   "a": "I had a dream the",
+   "b": "oth-er night, when",
+   "c": "ev-'ry-thing was",
+   "d": "still; I",
+   "e": "thought I saw Su-",
+   "f": "san-na dear a-",
+   "g": "com-in' down the",
+   "h": "hill."
+  }
+ ],
+ "melodyStart": -0.5,
+ "melody": [
+  [
+   "C5",
+   0.25
+  ],
+  [
+   "D5",
+   0.25
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "G5",
+   0.5
+  ],
+  [
+   "G5",
+   0.5
+  ],
+  [
+   "A5",
+   0.5
+  ],
+  [
+   "G5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "C5",
+   0.75
+  ],
+  [
+   "D5",
+   0.25
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "D5",
+   1.5
+  ],
+  [
+   "C5",
+   0.25
+  ],
+  [
+   "D5",
+   0.25
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "G5",
+   0.5
+  ],
+  [
+   "G5",
+   0.5
+  ],
+  [
+   "A5",
+   0.5
+  ],
+  [
+   "G5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "C5",
+   2.0
+  ],
+  [
+   "F5",
+   1.0
+  ],
+  [
+   "F5",
+   1.0
+  ],
+  [
+   "A5",
+   0.5
+  ],
+  [
+   "A5",
+   1.0
+  ],
+  [
+   "A5",
+   0.5
+  ],
+  [
+   "G5",
+   0.5
+  ],
+  [
+   "G5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "D5",
+   1.5
+  ],
+  [
+   "C5",
+   0.25
+  ],
+  [
+   "D5",
+   0.25
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "G5",
+   0.5
+  ],
+  [
+   "G5",
+   0.5
+  ],
+  [
+   "A5",
+   0.5
+  ],
+  [
+   "G5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "C5",
+   1.5
+  ]
+ ]
+}

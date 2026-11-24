@@ -1,0 +1,358 @@
+{
+ "title": "Yankee Doodle",
+ "artist": "Traditional, 1700s (public domain)",
+ "key": "C",
+ "beatsPerBar": 2,
+ "cellBeats": 2,
+ "normalTempo": 110,
+ "easyChord": {
+  "1": "C",
+  "2": "Dm",
+  "3": "Em",
+  "4": "F",
+  "5": "G",
+  "6": "Am",
+  "7": "Bdim"
+ },
+ "notes": "2/4. One cell per bar. Verse then chorus.",
+ "lines": [
+  [
+   [
+    "C",
+    "{a}"
+   ],
+   [
+    "G",
+    "{b}"
+   ],
+   [
+    "C",
+    "{c}"
+   ],
+   [
+    "G",
+    "{d}"
+   ]
+  ],
+  [
+   [
+    "C",
+    "{e}"
+   ],
+   [
+    "F",
+    "{f}"
+   ],
+   [
+    "G",
+    "{g}"
+   ],
+   [
+    "C",
+    "{h}"
+   ]
+  ],
+  [
+   [
+    "F",
+    "Yan-kee Doo-dle"
+   ],
+   [
+    "C",
+    "keep it up,"
+   ],
+   [
+    "G",
+    "Yan-kee Doo-dle"
+   ],
+   [
+    "C",
+    "dan-dy;"
+   ]
+  ],
+  [
+   [
+    "F",
+    "mind the mu-sic"
+   ],
+   [
+    "F",
+    "and the step, and"
+   ],
+   [
+    "G",
+    "with the girls be"
+   ],
+   [
+    "C",
+    "han-dy."
+   ]
+  ]
+ ],
+ "verses": [
+  {
+   "name": "Verse 1",
+   "a": "Yan-kee Doo-dle",
+   "b": "went to town, a-",
+   "c": "rid-ing on a",
+   "d": "po-ny;",
+   "e": "stuck a feath-er",
+   "f": "in his cap and",
+   "g": "called it mac-a-",
+   "h": "ro-ni."
+  },
+  {
+   "name": "Verse 2",
+   "a": "Fath'r and I went",
+   "b": "down to camp a-",
+   "c": "long with Cap-tain",
+   "d": "Good-in',",
+   "e": "and there we saw the",
+   "f": "men and boys as",
+   "g": "thick as has-ty",
+   "h": "pud-din'."
+  },
+  {
+   "name": "Verse 3",
+   "a": "And there was Cap-tain",
+   "b": "Wash-ing-ton up-",
+   "c": "on a slap-ping",
+   "d": "stal-lion,",
+   "e": "a-giv-ing or-ders",
+   "f": "to his men, I",
+   "g": "guess there was a",
+   "h": "mil-lion."
+  }
+ ],
+ "melodyStart": 0,
+ "melody": [
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "G4",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "C5",
+   1.0
+  ],
+  [
+   "B4",
+   0.5
+  ],
+  [
+   "G4",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "F5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "B4",
+   0.5
+  ],
+  [
+   "G4",
+   0.5
+  ],
+  [
+   "A4",
+   0.5
+  ],
+  [
+   "B4",
+   0.5
+  ],
+  [
+   "C5",
+   1.0
+  ],
+  [
+   "C5",
+   1.0
+  ],
+  [
+   "A4",
+   0.75
+  ],
+  [
+   "B4",
+   0.25
+  ],
+  [
+   "A4",
+   0.5
+  ],
+  [
+   "G4",
+   0.5
+  ],
+  [
+   "A4",
+   0.5
+  ],
+  [
+   "B4",
+   0.5
+  ],
+  [
+   "C5",
+   1.0
+  ],
+  [
+   "G4",
+   0.75
+  ],
+  [
+   "A4",
+   0.25
+  ],
+  [
+   "G4",
+   0.5
+  ],
+  [
+   "F4",
+   0.5
+  ],
+  [
+   "E4",
+   0.5
+  ],
+  [
+   "F4",
+   0.5
+  ],
+  [
+   "G4",
+   1.0
+  ],
+  [
+   "A4",
+   0.75
+  ],
+  [
+   "B4",
+   0.25
+  ],
+  [
+   "A4",
+   0.5
+  ],
+  [
+   "G4",
+   0.5
+  ],
+  [
+   "A4",
+   0.5
+  ],
+  [
+   "B4",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "A4",
+   0.5
+  ],
+  [
+   "G4",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "B4",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "C5",
+   1.0
+  ],
+  [
+   "C5",
+   1.0
+  ]
+ ]
+}

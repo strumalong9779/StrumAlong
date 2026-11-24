@@ -1,0 +1,385 @@
+{
+ "title": "Oh My Darling, Clementine",
+ "artist": "Traditional, 1884 (public domain)",
+ "key": "C",
+ "beatsPerBar": 3,
+ "cellBeats": 3,
+ "strumsPerCell": [
+  1,
+  3
+ ],
+ "normalTempo": 100,
+ "easyChord": {
+  "1": "C",
+  "2": "Dm",
+  "3": "Em",
+  "4": "F",
+  "5": "G",
+  "6": "Am",
+  "7": "Bdim"
+ },
+ "notes": "Waltz (3/4). One cell per bar. Strums/bar 2 = one strum a bar, 4 = three (oom-pah-pah).",
+ "lines": [
+  [
+   [
+    "C",
+    "{a}"
+   ],
+   [
+    "C",
+    "{b}"
+   ],
+   [
+    "C",
+    "{c}"
+   ],
+   [
+    "G",
+    "{d}"
+   ]
+  ],
+  [
+   [
+    "G",
+    "{e}"
+   ],
+   [
+    "C",
+    "{f}"
+   ],
+   [
+    "G",
+    "{g}"
+   ],
+   [
+    "C",
+    "{h}"
+   ]
+  ],
+  [
+   [
+    "C",
+    "Oh my dar-ling,"
+   ],
+   [
+    "C",
+    "oh my dar-ling,"
+   ],
+   [
+    "C",
+    "oh my dar-ling"
+   ],
+   [
+    "G",
+    "Clem-en-tine,"
+   ]
+  ],
+  [
+   [
+    "G",
+    "you are lost and"
+   ],
+   [
+    "C",
+    "gone for-ev-er,"
+   ],
+   [
+    "G",
+    "dread-ful sor-ry"
+   ],
+   [
+    "C",
+    "Clem-en-tine."
+   ]
+  ]
+ ],
+ "verses": [
+  {
+   "name": "Verse 1",
+   "a": "In a cav-ern,",
+   "b": "in a can-yon,",
+   "c": "ex-ca-vat-ing",
+   "d": "for a mine,",
+   "e": "dwelt a min-er,",
+   "f": "for-ty-nin-er,",
+   "g": "and his daugh-ter",
+   "h": "Clem-en-tine."
+  },
+  {
+   "name": "Verse 2",
+   "a": "Light she was and",
+   "b": "like a fair-y,",
+   "c": "and her shoes were",
+   "d": "num-ber nine;",
+   "e": "her-ring box-es",
+   "f": "with-out top-ses,",
+   "g": "san-dals were for",
+   "h": "Clem-en-tine."
+  },
+  {
+   "name": "Verse 3",
+   "a": "Drove she duck-lings",
+   "b": "to the wa-ter",
+   "c": "ev-'ry morn-ing",
+   "d": "just at nine;",
+   "e": "hit her foot a-",
+   "f": "gainst a splin-ter,",
+   "g": "fell in-to the",
+   "h": "foam-ing brine."
+  },
+  {
+   "name": "Verse 4",
+   "a": "Ru-by lips a-",
+   "b": "bove the wa-ter,",
+   "c": "blow-ing bub-bles",
+   "d": "soft and fine;",
+   "e": "but a-las, I",
+   "f": "was no swim-mer,",
+   "g": "so I lost my",
+   "h": "Clem-en-tine."
+  }
+ ],
+ "melodyStart": -1,
+ "melody": [
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "C5",
+   1.5
+  ],
+  [
+   "G4",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "E5",
+   1.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "G5",
+   1.5
+  ],
+  [
+   "G5",
+   0.5
+  ],
+  [
+   "F5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "D5",
+   2.0
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "F5",
+   1.5
+  ],
+  [
+   "F5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "E5",
+   1.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "D5",
+   1.5
+  ],
+  [
+   "G4",
+   0.5
+  ],
+  [
+   "B4",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "C5",
+   2.0
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "C5",
+   1.5
+  ],
+  [
+   "G4",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "E5",
+   1.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "G5",
+   1.5
+  ],
+  [
+   "G5",
+   0.5
+  ],
+  [
+   "F5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "D5",
+   2.0
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "F5",
+   1.5
+  ],
+  [
+   "F5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "E5",
+   1.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "C5",
+   0.5
+  ],
+  [
+   "E5",
+   0.5
+  ],
+  [
+   "D5",
+   1.5
+  ],
+  [
+   "G4",
+   0.5
+  ],
+  [
+   "B4",
+   0.5
+  ],
+  [
+   "D5",
+   0.5
+  ],
+  [
+   "C5",
+   2.0
+  ]
+ ]
+}

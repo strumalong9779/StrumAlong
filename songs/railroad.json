@@ -1,0 +1,206 @@
+{
+ "title": "I've Been Working on the Railroad",
+ "artist": "Traditional, 1894 (public domain)",
+ "key": "C",
+ "beatsPerBar": 4,
+ "cellBeats": 4,
+ "normalTempo": 100,
+ "pattern": "B.DUA.DU",
+ "easyChord": {
+  "1": "C",
+  "2": "Dm",
+  "3": "Em",
+  "4": "F",
+  "5": "G",
+  "6": "Am",
+  "7": "Bdim"
+ },
+ "notes": "4/4. One cell per bar. Words and chords only for now - no melody line yet (Listen plays the chords).",
+ "lines": [
+  [
+   [
+    "C",
+    "I've been work-ing"
+   ],
+   [
+    "C",
+    "on the rail-road,"
+   ],
+   [
+    "F",
+    "all the live-long"
+   ],
+   [
+    "C",
+    "day."
+   ]
+  ],
+  [
+   [
+    "C",
+    "I've been work-ing"
+   ],
+   [
+    "C",
+    "on the rail-road,"
+   ],
+   [
+    "Dm",
+    "just to pass the"
+   ],
+   [
+    "G",
+    "time a-way."
+   ]
+  ],
+  [
+   [
+    "C",
+    "Can't you hear the"
+   ],
+   [
+    "C",
+    "whis-tle blow-ing?"
+   ],
+   [
+    "F",
+    "Rise up so ear-ly"
+   ],
+   [
+    "C",
+    "in the morn."
+   ]
+  ],
+  [
+   [
+    "F",
+    "Can't you hear the"
+   ],
+   [
+    "C",
+    "cap-tain shout-ing,"
+   ],
+   [
+    "G",
+    "\"Di-nah, blow your"
+   ],
+   [
+    "C",
+    "horn!\""
+   ]
+  ],
+  [
+   [
+    "C",
+    "Di-nah, won't you"
+   ],
+   [
+    "F",
+    "blow,"
+   ],
+   [
+    "G",
+    "Di-nah, won't you"
+   ],
+   [
+    "C",
+    "blow,"
+   ]
+  ],
+  [
+   [
+    "C",
+    "Di-nah, won't you"
+   ],
+   [
+    "F",
+    "blow your"
+   ],
+   [
+    "G",
+    "horn?"
+   ],
+   [
+    "C",
+    "—"
+   ]
+  ],
+  [
+   [
+    "C",
+    "Some-one's in the"
+   ],
+   [
+    "C",
+    "kitch-en with Di-nah,"
+   ],
+   [
+    "C",
+    "some-one's in the"
+   ],
+   [
+    "G",
+    "kitch-en, I know;"
+   ]
+  ],
+  [
+   [
+    "C",
+    "some-one's in the"
+   ],
+   [
+    "F",
+    "kitch-en with Di-nah,"
+   ],
+   [
+    "G",
+    "strum-min' on the old"
+   ],
+   [
+    "C",
+    "ban-jo, and"
+   ]
+  ],
+  [
+   [
+    "C",
+    "sing-in' fee, fi,"
+   ],
+   [
+    "C",
+    "fid-dle-ee-i-o,"
+   ],
+   [
+    "G",
+    "fee, fi, fid-dle-ee-"
+   ],
+   [
+    "C",
+    "i-o-o-o-o;"
+   ]
+  ],
+  [
+   [
+    "C",
+    "fee, fi,"
+   ],
+   [
+    "F",
+    "fid-dle-ee-i-o,"
+   ],
+   [
+    "G",
+    "strum-min' on the old"
+   ],
+   [
+    "C",
+    "ban-jo."
+   ]
+  ]
+ ],
+ "verses": [
+  {
+   "name": "Whole song"
+  }
+ ]
+}
