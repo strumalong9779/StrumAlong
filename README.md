@@ -1,6 +1,6 @@
 # StrumAlong
 
-**Version 1.2.1** (November 2026) · see `CHANGELOG.md`
+**Version 1.2.2** (November 2026) · see `CHANGELOG.md`
 
 > **⚠️ Disclaimer:** StrumAlong is an independent, unofficial project. It is not made, endorsed, supported or approved by AeroBand or Anthropic.
 > It is provided free and "as is", without warranty of any kind. It does not change the guitar's firmware, but it does change guitar settings

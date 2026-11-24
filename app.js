@@ -2,7 +2,7 @@
 // Listens to the guitar's Bluetooth/USB MIDI, works out which chord each strum was and when,
 // lights the frets, plays the sound, and shows the song, the fret to press and timing feedback.
 'use strict';
-const APP_VERSION = '1.2.1';   // bump this for every release, and add a line to CHANGELOG.md
+const APP_VERSION = '1.2.2';   // bump this for every release, and add a line to CHANGELOG.md
 
 // ---------- constants ----------
 const FRET_COLORS = { 1:'#34c759', 2:'#2f6fe0', 3:'#e5443b', 4:'#9b59e0', 5:'#62cdf5', 6:'#f5d33d', 7:'#f26fb4' };
@@ -391,24 +391,37 @@ function ensureAudio() {
   if (S.audio && S.audio.state === 'suspended') S.audio.resume();
   if (fresh && S.audio) pinSpeakers(true);
 }
-// ---------- keep our sound on the Mac's own speakers ----------
-// When the guitar powers on, macOS switches its sound output to the guitar (it's also a Bluetooth
-// speaker), and the Mac strum goes silent. Pin our audio to the MacBook speakers instead.
-// Chrome only reveals speaker names after microphone permission, so we ask once (nothing is recorded).
+// ---------- where our sound goes ----------
+// The guitar is also a Bluetooth speaker, and when it powers on the computer may switch its sound output
+// to the guitar, so the clean strum would come out of the guitar (or get lost). Rule:
+//   - computer's output is the guitar  -> send our sound to the built-in speakers instead
+//   - anything else (speakers, headphones, AirPods, external) -> follow the computer's own choice
+// Re-checked whenever outputs change. Chrome only reveals device names after microphone permission,
+// so we ask once (nothing is recorded); without names we simply follow the computer.
 const SPEAKER_RE = /macbook|built-?in|internal|realtek|^speakers/i;   // Mac and typical Windows laptop speakers
+const cleanName = l => (l || '').replace(/^(default|communications)\s*-\s*/i, '').replace(/\s*\(.*\)$/, '');
 async function pinSpeakers(askIfNeeded = false) {
   if (!S.audio || !S.audio.setSinkId || !navigator.mediaDevices?.enumerateDevices) return;
   const outputs = async () => (await navigator.mediaDevices.enumerateDevices()).filter(d => d.kind === 'audiooutput');
   let outs = await outputs();
   if (askIfNeeded && !outs.some(d => d.label)) {
-    try { const s = await navigator.mediaDevices.getUserMedia({ audio: true }); s.getTracks().forEach(t => t.stop()); } catch {}
+    try { const st = await navigator.mediaDevices.getUserMedia({ audio: true }); st.getTracks().forEach(t => t.stop()); } catch {}
     outs = await outputs();
   }
-  const mac = outs.find(d => d.deviceId !== 'default' && SPEAKER_RE.test(d.label) && !/aero/i.test(d.label));
-  if (mac) {
-    try { if (S.audio.sinkId !== mac.deviceId) await S.audio.setSinkId(mac.deviceId); S.speaker = mac.label.replace(/\s*\(.*\)$/, ''); }
-    catch { S.speaker = null; }
-  } else S.speaker = null;
+  const def = outs.find(d => d.deviceId === 'default');
+  const defName = cleanName(def?.label);
+  try {
+    if (/aero/i.test(defName)) {
+      const builtIn = outs.find(d => d.deviceId !== 'default' && SPEAKER_RE.test(d.label) && !/aero/i.test(d.label));
+      if (builtIn) {
+        if (S.audio.sinkId !== builtIn.deviceId) await S.audio.setSinkId(builtIn.deviceId);
+        S.speaker = cleanName(builtIn.label);
+      } else S.speaker = null;
+    } else {
+      if (S.audio.sinkId !== '') await S.audio.setSinkId('');   // follow the computer's own output
+      S.speaker = defName || null;
+    }
+  } catch { S.speaker = null; }
   renderSound();
 }
 navigator.mediaDevices?.addEventListener?.('devicechange', () => pinSpeakers());
