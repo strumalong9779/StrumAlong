@@ -3,6 +3,9 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.2.3 — November 2026
+- Chord chart arrows now match what you play: in Follow me each block shows the one strum it waits for, and Easy is one down-strum per block (it follows Strums per bar). Found in a first-time-user test.
+
 ## 1.2.2 — November 2026
 - Sound now follows your computer's output choice (speakers, headphones, AirPods). Only if the computer switches its output to the guitar does StrumAlong send its sound to the built-in speakers instead. Previously headphones were ignored.
 

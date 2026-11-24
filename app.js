@@ -2,7 +2,7 @@
 // Listens to the guitar's Bluetooth/USB MIDI, works out which chord each strum was and when,
 // lights the frets, plays the sound, and shows the song, the fret to press and timing feedback.
 'use strict';
-const APP_VERSION = '1.2.2';   // bump this for every release, and add a line to CHANGELOG.md
+const APP_VERSION = '1.2.3';   // bump this for every release, and add a line to CHANGELOG.md
 
 // ---------- constants ----------
 const FRET_COLORS = { 1:'#34c759', 2:'#2f6fe0', 3:'#e5443b', 4:'#9b59e0', 5:'#62cdf5', 6:'#f5d33d', 7:'#f26fb4' };
@@ -515,6 +515,11 @@ const LEVEL_PATTERNS = {
 };
 function songPattern() {
   const bpb = S.song?.beatsPerBar || 4, lvl = LEVEL_PATTERNS[S.strumLevel];
+  // Easy = one down-strum at the start of every block, so it always matches "Strums per bar".
+  if (S.strumLevel === 'easy') {
+    const step = S.slotBeats || bpb / S.spb;
+    return Array.from({ length: bpb * 2 }, (_, k) => (Math.abs(((k / 2) / step) - Math.round((k / 2) / step)) < 1e-6 ? 'D' : '.')).join('');
+  }
   if (lvl && lvl[bpb]) return lvl[bpb];
   return (S.song?.pattern || DEFAULT_PATTERNS[bpb] || 'D.'.repeat(bpb)).replace(/\s+/g, '');
 }
@@ -755,9 +760,12 @@ function drawLane() {
     // The strums the song's pattern expects in this block: ↓ down, ↑ up, • bass note.
     const pat = songPattern(), sb = S.slotBeats || 1, inner = px - gap - 2;
     g.font = '700 15px -apple-system, Helvetica, sans-serif';
+    // Follow me waits for ONE strum per block, so show just that one (the first strum the pattern has there).
+    const oneStrum = S.mode === 'follow' && !S.demo;
     for (let k = Math.ceil(s.beat * 2 - 1e-6); k / 2 < s.beat + sb - 1e-6; k++) {
       const ch = pat[k % pat.length]; if (!ch || ch === '.') continue;
       const ax = x + gap + 6 + ((k / 2 - s.beat) / sb) * (inner - 12);
+      if (oneStrum) { g.fillText(ch === 'U' ? '↑' : '↓', x + gap + 10, top + bh - 14); break; }
       g.fillText(ch === 'D' ? '↓' : ch === 'U' ? '↑' : '•', ax, top + bh - 14);
     }
     g.font = '600 20px -apple-system, Helvetica, sans-serif';
