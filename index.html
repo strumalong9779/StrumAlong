@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta http-equiv="Cache-Control" content="no-store">
+<title>StrumAlong – free play-along app for the AeroBand guitar</title>
+<meta name="description" content="StrumAlong is a free, open-source companion app for the AeroBand smart guitar (Aero Guitar). Play along on your Mac or Windows computer: the song waits for your strum, the frets light up, and the words and chords show on a big screen. Runs in Chrome or Edge – no install.">
+<meta name="keywords" content="AeroBand, AeroBand guitar, Aero Guitar, AeroBand app, smart guitar, play-along, chords, lyrics, Easy Chord, MIDI guitar, Web Bluetooth, free, open source">
+<meta property="og:title" content="StrumAlong – free play-along app for the AeroBand guitar">
+<meta property="og:description" content="A free companion app for the AeroBand smart guitar: big-screen chords and lyrics, lit frets, and a song that waits for your strum.">
+<meta property="og:type" content="website">
+<style>
+  :root {
+    --bg:#121418; --panel:#1b1e24; --line:#2b3039; --fg:#ece9e2; --dim:#8b919b;
+    --ok:#4fd18b; --early:#f2b84b; --late:#ff8a5c; --bad:#ff5a5a;
+  }
+  * { box-sizing:border-box; }
+  html, body { margin:0; height:100%; }
+  body { background:var(--bg); color:var(--fg); font:16px/1.35 -apple-system, "SF Pro Text", Helvetica, sans-serif; display:flex; flex-direction:column; }
+  header { display:flex; align-items:center; gap:14px; padding:12px 22px; border-bottom:1px solid var(--line); flex-wrap:wrap; }
+  header h1 { font-size:19px; margin:0; font-weight:650; letter-spacing:.01em; }
+  #song-title { color:var(--dim); }
+  .chip { padding:4px 10px; border-radius:12px; font-size:13px; background:#3a2626; color:#ffb4a6; }
+  .chip.ok { background:#1d3a2d; color:var(--ok); }
+  .spacer { flex:1; }
+  select, button { font:inherit; font-size:14px; background:#262a32; color:var(--fg); border:1px solid #3a404b; border-radius:7px; padding:6px 12px; }
+  button { cursor:pointer; }
+  button.primary { background:#2f6fe0; border-color:#2f6fe0; font-weight:600; min-width:96px; }
+  .seg { display:inline-flex; border:1px solid #3a404b; border-radius:8px; overflow:hidden; }
+  .seg button { border:0; border-radius:0; background:#262a32; }
+  .seg button.on { background:#3d4452; color:#fff; font-weight:600; }
+  label.ctl { display:flex; align-items:center; gap:8px; font-size:14px; color:var(--dim); }
+  #tempo { width:200px; accent-color:#5ac8f0; }
+  #tempo-val { color:var(--fg); min-width:118px; font-variant-numeric:tabular-nums; }
+  .hidden { display:none !important; }
+
+  main { flex:1; display:grid; grid-template-columns: 1fr 330px; gap:16px; padding:16px 22px; min-height:0; }
+  .panel { background:var(--panel); border-radius:12px; padding:14px 18px; }
+  h2 { font-size:12px; text-transform:uppercase; letter-spacing:.09em; color:var(--dim); margin:0 0 10px; font-weight:600; }
+
+  /* big chord */
+  #now-row { display:flex; align-items:stretch; gap:16px; }
+  #now-card { flex:1; border-radius:14px; padding:14px 22px; display:flex; align-items:center; gap:22px; min-height:150px; transition:background .15s; }
+  #now-fret { width:96px; height:96px; border-radius:18px; display:flex; flex-direction:column; align-items:center; justify-content:center; font-weight:700; color:#111; box-shadow:0 0 34px rgba(255,255,255,.18); }
+  #now-fret .n { font-size:46px; line-height:1; }
+  #now-fret .l { font-size:13px; text-transform:uppercase; letter-spacing:.08em; }
+  #now-chord { font-size:84px; font-weight:750; line-height:1; letter-spacing:-.02em; }
+  #now-sub { color:var(--dim); font-size:16px; margin-top:6px; }
+  #next-card { width:190px; border-radius:14px; background:#22262d; padding:14px 18px; display:flex; flex-direction:column; justify-content:center; }
+  #next-card .cap { color:var(--dim); font-size:12px; text-transform:uppercase; letter-spacing:.09em; }
+  #next-chord { font-size:44px; font-weight:700; display:flex; align-items:center; gap:12px; margin-top:6px; }
+  #next-dot { width:30px; height:30px; border-radius:8px; color:#111; font-size:16px; font-weight:700; display:flex; align-items:center; justify-content:center; }
+
+  #lane-wrap { margin-top:16px; }
+  canvas#lane { width:100%; height:150px; display:block; border-radius:10px; background:#16191e; }
+
+  #lyrics { margin-top:16px; }
+  .lyr-line { display:flex; gap:0; margin:4px 0 14px; }
+  .lyr-bar { flex:1 1 auto; padding:6px 10px 8px; border-left:3px solid transparent; border-radius:6px; }
+  .lyr-bar .c { font-size:18px; font-weight:700; display:flex; align-items:center; gap:7px; min-height:24px; }
+  .lyr-bar .c i { width:12px; height:12px; border-radius:3px; display:inline-block; }
+  .lyr-bar .w { font-size:27px; min-height:36px; }
+  .lyr-bar.empty { flex:0 0 34px; padding-left:6px; padding-right:0; }
+  .lyr-bar.empty .c { white-space:nowrap; }
+  .lyr-line.cur .lyr-bar.cur { background:#2a303a; }
+  .lyr-line.next { opacity:.42; }
+  .lyr-line.next .w { font-size:21px; }
+  #verse-name { color:var(--dim); font-size:13px; }
+
+  /* side */
+  #neck { display:flex; flex-direction:column; gap:7px; }
+  .fret { display:flex; align-items:center; gap:12px; padding:6px 10px; border-radius:9px; border:2px solid transparent; transition:all .12s; }
+  .fret .sw { width:34px; height:34px; border-radius:8px; color:#111; font-weight:750; display:flex; align-items:center; justify-content:center; font-size:17px; }
+  .fret .nm { font-size:20px; font-weight:650; }
+  .fret .tag { margin-left:auto; font-size:12px; color:var(--dim); }
+  .fret.dimmed { opacity:.35; }
+  .fret.want { border-color:#fff; background:#2a2f38; opacity:1; }
+  .fret.heard { box-shadow:0 0 0 3px var(--ok) inset; }
+  .fret.heard.wrong { box-shadow:0 0 0 3px var(--bad) inset; }
+
+  .grp { display:flex; align-items:center; gap:8px; position:relative; }
+  .sep { width:1px; height:28px; background:var(--line); }
+  #settings-panel { position:absolute; right:0; top:calc(100% + 10px); z-index:50; background:var(--panel); border:1px solid #3a404b;
+    border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:12px; min-width:280px; box-shadow:0 12px 32px #000a; }
+  #settings-panel.hidden { display:none; }
+  #settings-panel label.ctl { justify-content:space-between; color:var(--fg); }
+  #settings-panel .tools { border-top:1px solid var(--line); padding-top:12px; }
+  dialog#manage-dlg { background:var(--panel); color:var(--fg); border:1px solid #3a404b; border-radius:14px; padding:18px 20px; width:min(560px, 92vw); }
+  dialog#manage-dlg::backdrop { background:#0009; }
+  .mg-row { display:flex; align-items:center; gap:10px; padding:6px 0; border-bottom:1px solid var(--line); }
+  .mg-row input { flex:1; font:inherit; background:#22262d; color:var(--fg); border:1px solid #3a404b; border-radius:7px; padding:6px 10px; }
+  .mg-row.mg-hidden input { opacity:.45; }
+  .mg-kind { font-size:12px; color:var(--dim); width:60px; }
+  .mg-row button.armed { background:#5a1f1f; border-color:var(--bad); color:#ffb4a6; }
+  #lights-btn.on { background:#1d3a2d; border-color:#4fd18b; color:#4fd18b; }
+  #sound-status { margin-top:14px; font-size:14px; padding:8px 10px; border-radius:8px; background:#22262d; }
+  #sound-status:empty { display:none; }
+  #last { margin-top:14px; font-size:15px; }
+  #last .big { font-size:30px; font-weight:700; }
+  #pace { margin-top:14px; font-size:15px; color:var(--dim); }
+  #pace b { color:var(--fg); font-size:24px; }
+  #stats { margin-top:14px; font-size:14px; color:var(--dim); line-height:1.6; }
+  #setup { margin-top:14px; font-size:13px; color:var(--dim); }
+  #msg { position:fixed; left:50%; top:42%; transform:translate(-50%,-50%); font-size:110px; font-weight:800; color:#fff; text-shadow:0 4px 30px #000; pointer-events:none; }
+  #drop { position:fixed; inset:0; background:rgba(47,111,224,.25); border:4px dashed #5ac8f0; display:flex; align-items:center; justify-content:center; font-size:32px; font-weight:700; }
+  .kbd { font-size:12px; color:var(--dim); }
+</style>
+</head>
+<body>
+<header>
+  <h1>StrumAlong <span id="app-ver" style="font-size:12px;color:var(--dim);font-weight:400"></span></h1>
+  <span id="song-title" class="hidden"></span>
+  <!-- Song -->
+  <div class="grp"><select id="song-pick" title="Song"></select><select id="verse-pick" title="Which verses"></select></div>
+  <span class="sep"></span>
+  <!-- Play -->
+  <div class="grp"><button id="start" class="primary">Start</button><button id="listen">▶ Listen</button><button id="restart">Restart</button></div>
+  <span class="sep"></span>
+  <!-- Mode -->
+  <div class="seg" id="mode-seg">
+    <button data-mode="follow" class="on">Follow me</button>
+    <button data-mode="fixed">Fixed tempo</button>
+    <button data-mode="free">Free play</button>
+  </div>
+  <span class="sep"></span>
+  <!-- Sound -->
+  <div class="seg" id="sound-seg" title="Where the sound comes from">
+    <button data-sound="guitar" class="on" title="The guitar's own speaker">Guitar</button>
+    <button data-sound="mac" title="Computer · perfect strum: a clean strum of the chord you meant">Computer</button>
+    <button data-sound="finger" title="Like a real guitar: the computer plays exactly what each string plays (StrumAlong turns Easy Chord off)">Natural</button>
+    <button data-sound="silent" title="Your strums make no sound (turn the guitar's volume knob down) but are still read and graded — for practising along with Backing or Listen">Silent</button>
+  </div>
+  <label class="ctl" title="Loudness of the computer sound">Vol
+    <input id="vol" type="range" min="0.5" max="4" step="0.1" style="width:90px;accent-color:#5ac8f0">
+  </label>
+  <span class="sep"></span>
+  <label class="ctl" id="tempo-ctl">Tempo
+    <input id="tempo" type="range" min="30" max="80" step="1">
+    <span id="tempo-val"></span>
+  </label>
+  <span class="spacer"></span>
+  <!-- Guitar -->
+  <div class="grp"><button id="lights-btn" title="Connect to the guitar over Bluetooth: lights, notes and setup">💡 Connect</button><span id="guitar" class="chip">not connected</span></div>
+  <!-- Settings -->
+  <div class="grp" id="settings-grp">
+    <button id="settings-btn" title="Practice settings">⚙ Settings</button>
+    <div id="settings-panel" class="hidden">
+      <h2>Practice settings</h2>
+      <label class="ctl" title="Which chords go on the guitar's 7 frets: just this song's chords (frets 1–4 or so), or all 7 chords of the song's key like AeroBand's own layout">Fret layout
+        <select id="fret-layout"><option value="song">Song chords</option><option value="key">Full key (7)</option></select>
+      </label>
+      <label class="ctl" title="How Listen/Backing strum, and the arrows in the chart: Easy = down-strums on the beat, Medium = a few up-strums, Full = the song's real pattern">Strum pattern
+        <select id="strum-level"><option value="easy">Easy</option><option value="medium">Medium</option><option value="full">Full</option></select>
+      </label>
+      <label class="ctl" title="How many strums each bar is split into (Follow me moves one block per strum)">Strums per bar
+        <select id="spb"><option selected>2</option><option>4</option></select>
+      </label>
+      <label class="ctl" title="Play the tune during Listen and Fixed tempo"><input type="checkbox" id="melody" checked> Melody</label>
+      <label class="ctl" id="click-ctl"><input type="checkbox" id="click" checked> Click (Fixed tempo)</label>
+      <label class="ctl" id="backing-ctl" title="Fixed tempo: the computer plays the chords (like Listen) while you play along"><input type="checkbox" id="backing"> Backing (Fixed tempo)</label>
+    </div>
+  </div>
+  <input id="add-song-file" type="file" accept=".txt,.text,.cho,.crd,.pro,.chopro,.chordpro,.json,text/plain" multiple class="hidden">
+</header>
+
+<main>
+  <section>
+    <div id="now-row">
+      <div id="now-card" class="panel">
+        <div id="now-fret"><div class="l">fret</div><div class="n">1</div></div>
+        <div>
+          <div id="now-chord">C</div>
+          <div id="now-sub">Press Start, then strum</div>
+        </div>
+      </div>
+      <div id="next-card">
+        <div class="cap">Next</div>
+        <div id="next-chord"><span id="next-dot"></span><span id="next-name"></span></div>
+      </div>
+    </div>
+
+    <div id="lane-wrap" class="panel" style="padding:10px">
+      <canvas id="lane"></canvas>
+    </div>
+
+    <div id="lyrics" class="panel">
+      <h2>Words <span id="verse-name"></span></h2>
+      <div id="lyr-cur" class="lyr-line cur"></div>
+      <div id="lyr-next" class="lyr-line next"></div>
+    </div>
+  </section>
+
+  <aside class="panel">
+    <h2>Easy Chord frets</h2>
+    <div id="neck"></div>
+    <div id="sound-status"></div>
+    <div id="last"></div>
+    <div id="pace"></div>
+    <div id="stats"></div>
+    <div id="setup"></div>
+    <div class="kbd" style="margin-top:14px">No guitar? Keys 1–7 strum that fret (hold Shift for an up-strum). Drop a chord sheet or lyrics text file (.txt / ChordPro) anywhere to turn it into a song.</div>
+  </aside>
+</main>
+<dialog id="manage-dlg">
+  <h2>Manage songs</h2>
+  <div class="kbd" style="margin-bottom:10px">Click a name to rename it. <b>Delete</b> removes the song (click twice).</div>
+  <div id="mg-list"></div>
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-top:14px">
+    <button id="mg-add">📂 Add song…</button>
+    <button id="mg-done" class="primary">Done</button>
+  </div>
+</dialog>
+<div id="msg" class="hidden"></div>
+<div id="drop" class="hidden">Drop a chord sheet, ChordPro, lyrics or song file</div>
+<script>
+  // Always load the newest code (otherwise Chrome may reuse a stale cached copy).
+  for (const f of ['app.js', 'importer.js']) document.write(`<script src="${f}?t=${Date.now()}"><\/script>`);
+</script>
+</body>
+</html>

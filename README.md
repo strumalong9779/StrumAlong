@@ -1,0 +1,54 @@
+# StrumAlong
+
+**Version 1.1.2** (November 2026) · see `CHANGELOG.md`
+
+> **⚠️ Disclaimer:** StrumAlong is an independent, unofficial project. It is not made, endorsed, supported or approved by AeroBand or Anthropic.
+> It is provided free and "as is", without warranty of any kind. It does not change the guitar's firmware, but it does change guitar settings
+> (mode, lights, Easy Chord layout). **Use it entirely at your own risk**; the authors accept no liability for any damage, malfunction,
+> voided warranty or other problem. The official AeroBand app can restore the guitar's settings. "AeroBand" is a trademark of its owner,
+> used only to say which guitar this works with. **By using StrumAlong, you agree to these terms.** If you don't agree, don't use it.
+
+A free, open-source **companion app for the AeroBand smart guitar** (also called the Aero Guitar), running in Chrome or Edge on a Mac or Windows computer. An easier way to learn and play songs on your AeroBand guitar, on a big screen.
+It lights the guitar's frets for each chord, shows the words and a scrolling chord chart on a big screen,
+and can **follow your pace**: the song waits for your strum instead of racing ahead.
+
+- No install, no drivers, no AeroBand phone app needed.
+- Works with the guitar over Bluetooth, straight from the browser.
+- Bring your own songs: drop a chord sheet (text or ChordPro) on the window.
+
+**Guides:** `docs/StrumAlong-Quick-Start.pdf` (first use, 2 pages), `docs/StrumAlong-User-Guide.pdf` (how to play) and `docs/StrumAlong-Technical-Guide.pdf` (how it works, how to change it).
+
+## Quick start
+
+1. Use **Chrome or Edge** on a Mac or Windows computer with Bluetooth. (Safari and Firefox can't talk to Bluetooth devices.)
+2. Open the app:
+   - **Hosted:** open **https://strumalong9779.github.io/StrumAlong/** in Chrome or Edge. Nothing to install.
+   - **Downloaded:** get the latest `StrumAlong-x.y.z.zip` from this project's **Releases** page and unzip it. Mac: double-click `Start StrumAlong (Mac).command` (the first time, right-click it and choose Open). Windows: double-click `Start StrumAlong (Windows).bat` (needs Python from python.org).
+3. Turn the guitar on, close the AeroBand phone app, click **💡 Connect**, pick the guitar in the list.
+4. Choose a song, press **Start**, strum.
+
+**Sound:** normally the sound comes out of the **computer**, not the guitar: choose **Computer** (a clean strum of the chord you meant) or **Natural** (exactly what you play), and turn the guitar's volume knob down. **Guitar** uses the guitar's own speaker; **Silent** plays nothing. The user guide explains each one.
+
+Opening `index.html` by double-clicking won't work: browsers only allow Bluetooth on `https://` or `http://localhost` pages.
+
+## Credits
+
+- Written with **Claude Opus 5.5** (Anthropic's AI), at the direction of, and tested by, the project's human author.
+- Guitar sound: FluidR3_GM soundfont by Frank Wen, CC BY 3.0, served by gleitz/midi-js-soundfonts.
+- Built-in songs are traditional, public-domain tunes.
+
+## Not affiliated
+
+StrumAlong is an independent project. It is not made by, endorsed by or affiliated with AeroBand
+or Anthropic. "AeroBand" is a trademark of its owner. The app talks to the guitar using commands
+observed from the guitar's own Bluetooth traffic, for interoperability; use at your own risk.
+
+## Why it exists, and contributing
+
+We think the AeroBand guitar is a great product. StrumAlong is meant to enhance it, not compete with it: a big-screen way to
+learn and play that we hope brings more people to the guitar. AeroBand's own input is welcome.
+
+Contributions are welcome: open an **Issue** for bugs and ideas, or send a **pull request** with fixes, features or
+public-domain songs. For guitar commands, only use ones seen from the official app, and test one change at a time.
+
+License: MIT (see `LICENSE`).
