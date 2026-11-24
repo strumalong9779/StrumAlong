@@ -140,7 +140,7 @@
   </label>
   <span class="spacer"></span>
   <!-- Guitar -->
-  <div class="grp"><button id="lights-btn" title="Connect to the guitar over Bluetooth: lights, notes and setup">💡 Connect</button><span id="guitar" class="chip">not connected</span></div>
+  <div class="grp"><button id="lights-btn" title="Connect to the guitar over Bluetooth: lights, notes and setup. Click again to restore the guitar and disconnect.">💡 Connect</button><span id="guitar" class="chip">not connected</span></div>
   <!-- Settings -->
   <div class="grp" id="settings-grp">
     <button id="settings-btn" title="Practice settings">⚙ Settings</button>
@@ -158,6 +158,7 @@
       <label class="ctl" title="Play the tune during Listen and Fixed tempo"><input type="checkbox" id="melody" checked> Melody</label>
       <label class="ctl" id="click-ctl"><input type="checkbox" id="click" checked> Click (Fixed tempo)</label>
       <label class="ctl" id="backing-ctl" title="Fixed tempo: the computer plays the chords (like Listen) while you play along"><input type="checkbox" id="backing"> Backing (Fixed tempo)</label>
+      <div class="tools"><button id="restore-btn" title="Put the guitar back the way it came: factory chords on the frets (C Dm Em F G Am Bdim), Easy Chord on, its own light colours. Then disconnects. Do this before going back to the AeroBand app.">↺ Restore guitar &amp; disconnect</button></div>
     </div>
   </div>
   <input id="add-song-file" type="file" accept=".txt,.text,.cho,.crd,.pro,.chopro,.chordpro,.json,text/plain" multiple class="hidden">

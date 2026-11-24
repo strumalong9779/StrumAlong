@@ -1,11 +1,11 @@
 # StrumAlong
 
-**Version 1.1.2** (November 2026) · see `CHANGELOG.md`
+**Version 1.2.0** (November 2026) · see `CHANGELOG.md`
 
 > **⚠️ Disclaimer:** StrumAlong is an independent, unofficial project. It is not made, endorsed, supported or approved by AeroBand or Anthropic.
 > It is provided free and "as is", without warranty of any kind. It does not change the guitar's firmware, but it does change guitar settings
 > (mode, lights, Easy Chord layout). **Use it entirely at your own risk**; the authors accept no liability for any damage, malfunction,
-> voided warranty or other problem. The official AeroBand app can restore the guitar's settings. "AeroBand" is a trademark of its owner,
+> voided warranty or other problem. These settings stay on the guitar after it is switched off; StrumAlong's **Restore guitar** button (or the official AeroBand app) puts them back. "AeroBand" is a trademark of its owner,
 > used only to say which guitar this works with. **By using StrumAlong, you agree to these terms.** If you don't agree, don't use it.
 
 A free, open-source **companion app for the AeroBand smart guitar** (also called the Aero Guitar), running in Chrome or Edge on a Mac or Windows computer. An easier way to learn and play songs on your AeroBand guitar, on a big screen.
@@ -26,6 +26,7 @@ and can **follow your pace**: the song waits for your strum instead of racing ah
    - **Downloaded:** get the latest `StrumAlong-x.y.z.zip` from this project's **Releases** page and unzip it. Mac: double-click `Start StrumAlong (Mac).command` (the first time, right-click it and choose Open). Windows: double-click `Start StrumAlong (Windows).bat` (needs Python from python.org).
 3. Turn the guitar on, close the AeroBand phone app, click **💡 Connect**, pick the guitar in the list.
 4. Choose a song, press **Start**, strum.
+5. **Done?** Click **💡 Connected** (or Settings → ↺ Restore guitar & disconnect) to put the guitar back the way it came.
 
 **Sound:** normally the sound comes out of the **computer**, not the guitar: choose **Computer** (a clean strum of the chord you meant) or **Natural** (exactly what you play), and turn the guitar's volume knob down. **Guitar** uses the guitar's own speaker; **Silent** plays nothing. The user guide explains each one.
 
