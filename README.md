@@ -20,7 +20,7 @@ and can **follow your pace**: the song waits for your strum instead of racing ah
 
 ## Quick start
 
-1. Use **Chrome or Edge** on a Mac or Windows computer with Bluetooth. (Safari and Firefox can't talk to Bluetooth devices.)
+1. Use **Chrome or Edge** on a Mac or Windows computer with Bluetooth. (Safari and Firefox can't talk to Bluetooth devices.) **Not iPhone or iPad**, in any browser: Apple's browser engine can't reach Bluetooth devices. **Android** tablets with Chrome: untested.
 2. Open the app:
    - **Hosted:** open **https://strumalong9779.github.io/StrumAlong/** in Chrome or Edge. Nothing to install.
    - **Downloaded:** get the latest `StrumAlong-x.y.z.zip` from this project's **Releases** page and unzip it. Mac: double-click `Start StrumAlong (Mac).command` (the first time, right-click it and choose Open). Windows: double-click `Start StrumAlong (Windows).bat` (needs Python from python.org).
