@@ -3,6 +3,10 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.3.0 — November 2026
+- New **Strum style** (Settings, for Computer sound): you strum once per block and the computer plays a pattern: Plain strum, Boom-chuck, Fingerpick or Arpeggio. It keeps to the song's tempo in Fixed tempo and to your own pace in Follow me; strumming harder plays louder.
+- Up-strum trick: strum up instead of down and the pattern ends with a bass walk into the next chord (e.g. G, A, B into C).
+
 ## 1.2.3 — November 2026
 - Chord chart arrows now match what you play: in Follow me each block shows the one strum it waits for, and Easy is one down-strum per block (it follows Strums per bar). Found in a first-time-user test.
 

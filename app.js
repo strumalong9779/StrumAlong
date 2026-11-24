@@ -2,7 +2,7 @@
 // Listens to the guitar's Bluetooth/USB MIDI, works out which chord each strum was and when,
 // lights the frets, plays the sound, and shows the song, the fret to press and timing feedback.
 'use strict';
-const APP_VERSION = '1.2.3';   // bump this for every release, and add a line to CHANGELOG.md
+const APP_VERSION = '1.3.0';   // bump this for every release, and add a line to CHANGELOG.md
 
 // ---------- constants ----------
 const FRET_COLORS = { 1:'#34c759', 2:'#2f6fe0', 3:'#e5443b', 4:'#9b59e0', 5:'#62cdf5', 6:'#f5d33d', 7:'#f26fb4' };
@@ -55,6 +55,7 @@ const S = {
   click: store.get('click', true),
   backing: store.get('backing', false),          // Fixed tempo: the Mac strums the chords along with you
   strumLevel: store.get('strumLevel', 'easy'),   // easy / medium / full strum pattern
+  strumStyle: store.get('strumStyle', 'plain'),  // Computer sound: plain / boom (boom-chuck) / pick (fingerpick) / arp (arpeggio)
   fretLayout: store.get('fretLayout', 'song'),   // 'song' = only the song's chords; 'key' = all 7 chords of the key
   volume: store.get('volume', 2.2),     // Mac sound level (1 = old level)
   verse: store.get('verse', 'all'),
@@ -264,18 +265,123 @@ function macPlay(p) {
   const dir = p.notes.length >= 2 ? strumDir(p.notes) : 'down';
   const vel = p.vels.reduce((a, b) => a + b, 0) / p.vels.length;
   p.macChord = chord; p.macDir = dir;
-  strumChord(chord, dir, vel);
+  playStyled(chord, dir, vel, p.t);
 }
-function strumChord(chord, dir, vel, when) {
+function strumChord(chord, dir, vel, when, top = 0) {
   if (!S.samples || !S.audio) return;
   let v = VOICINGS[chord] || voicing(chord);
   let strings = v.map((n, s) => ({ n, s })).filter(x => x.n != null);
+  if (top) strings = strings.slice(-top);
   if (dir === 'up') strings = strings.slice(-4).reverse();     // up-strums catch the top strings
   const spread = dir === 'up' ? 0.011 : 0.014;
   // Even, musical loudness: mostly fixed, a little of your dynamics kept.
   const level = (0.55 + 0.3 * Math.min(1, vel / 100)) * (dir === 'up' ? 0.8 : 1);
   const t0 = when ?? (S.audio.currentTime + 0.005);
   strings.forEach((x, i) => playNote(x.s, x.n, t0 + i * spread, level * (0.92 + 0.08 * Math.random())));
+}
+// ---------- Strum styles (Computer sound): you strum once, the computer plays a pattern over the block ----------
+// The first note sounds straight away (so it still feels instant); the rest follows in time until the
+// next block. Your next strum cuts off whatever is left. Up-strum = a bass walk into the next chord.
+// Loudness follows how hard you strummed.
+const STYLE_TICK_MS = 20, STYLE_AHEAD_MS = 60;
+function bassPair(chord) {
+  const v = VOICINGS[chord] || voicing(chord), pc = chordPCs(chord);
+  const low = v.slice(0, 4).map((n, i) => ({ n, i })).filter(x => x.n != null);
+  if (!low.length) return { root: null, alt: null };
+  const r = (pc && low.find(x => x.n % 12 === pc.root)) || low[0];
+  const fifth = pc && low.find(x => x.i < 3 && x.n !== r.n && x.n % 12 === (pc.root + 7) % 12);
+  const next = low.find(x => x.i > r.i);
+  return { root: r.n, alt: (fifth || next || r).n };
+}
+function trebleNotes(chord) {
+  const v = VOICINGS[chord] || voicing(chord);
+  return v.map((n, i) => ({ n, i })).filter(x => x.n != null).slice(-3);   // the top three strings that sound
+}
+function songScale() {   // every note used by the song's chords ≈ its scale
+  const set = new Set();
+  for (const sl of S.slots) { const c = chordPCs(sl.chord); if (c) c.pcs.forEach(x => set.add(x)); }
+  return set;
+}
+function nextChordFor(t) {
+  if (!S.playing || !S.slots.length) return null;
+  const i = S.mode === 'fixed' ? Math.round(fixedPos(t)) : S.mode === 'follow' ? S.pos : -1;
+  return i >= 0 ? S.slots[i + 1]?.chord || null : null;
+}
+function bassWalk(fromChord, toChord) {   // e.g. G → C : A, B (then the next strum lands on C)
+  const a = bassPair(fromChord).root, b0 = bassPair(toChord).root;
+  if (a == null || b0 == null || fromChord === toChord) return [];
+  let b = b0; while (b - a > 6) b -= 12; while (a - b > 6) b += 12;
+  const scale = songScale(), step = b > a ? 1 : -1, out = [];
+  for (let n = a + step; n !== b; n += step) if (scale.has(((n % 12) + 12) % 12)) out.push(n);
+  return out.slice(-2);
+}
+function blockMs(t) {
+  if (S.mode === 'fixed' && S.playing) return slotMs();
+  // Follow me / Free play: no clock, so follow your own pace (recent gaps between strums).
+  const h = (S.styleTimes ||= []); h.push(t); if (h.length > 4) h.shift();
+  const gaps = h.slice(1).map((x, i) => x - h[i]).filter(g => g > 250 && g < 4000).sort((x, y) => x - y);
+  const pace = gaps.length ? gaps[Math.floor(gaps.length / 2)] : slotMs();
+  return Math.max(450, Math.min(3000, pace));
+}
+function stylePlan(chord, dir, vel, t) {
+  const st = S.strumStyle, T = blockMs(t);
+  const beats = S.slotBeats || (S.song?.beatsPerBar || 4) / S.spb, bpb = S.song?.beatsPerBar || 4;
+  // Note grid: eighths, doubled (to sixteenths) when the song is slow, so picking keeps flowing.
+  const base = Math.max(2, Math.round(beats * 2)); let mul = 1;
+  while (T / (base * mul) > 380 && mul < 4) mul *= 2;
+  const E = base * mul, e8 = T / E;
+  const f = 0.7 + 0.45 * Math.min(1, vel / 100);              // how hard you strummed
+  const { root, alt } = bassPair(chord), tre = trebleNotes(chord);
+  const flip = (S.styleFlip = !S.styleFlip);                  // alternate bass from block to block
+  const ev = [];   // { k: eighth, fn(at) }
+  const note = (k, key, n, lvl) => n != null && ev.push({ k, fn: at => playNote(key, n, at, lvl * f) });
+  if (st === 'boom') {
+    if (beats < 2) { note(0, 'bass', flip ? root : alt, 0.7); ev.push({ k: (base >= 3 ? 2 : 1) * mul, fn: at => strumChord(chord, 'down', vel * 0.8, at, 4) }); }
+    else for (let j = 0; j < beats; j++) {
+      const bassBeat = bpb === 3 ? j % 3 === 0 : j % 2 === 0;
+      if (bassBeat) note(j * 2 * mul, 'bass', (j % 4 === 0) === flip ? root : alt, 0.75);
+      else ev.push({ k: j * 2 * mul, fn: at => strumChord(chord, 'down', vel * 0.8, at, 4) });
+    }
+  } else if (st === 'pick') {
+    for (let k = 0; k < E; k++) {
+      const j = k >> 1;
+      if (k % 2 === 0) {
+        note(k, 'thumb', (j % 2 === 0) === flip ? root : alt, 0.72);
+        if (k === 0 && tre[2]) note(k, 'f' + tre[2].i, tre[2].n, 0.55);   // pinch: thumb + top string together
+      } else { const x = tre[j % 2 === 0 ? 1 : 0] || tre[0]; if (x) note(k, 'f' + x.i, x.n, 0.5); }
+    }
+  } else if (st === 'arp') {
+    const v = VOICINGS[chord] || voicing(chord);
+    const ri = v.findIndex(n => n === root);
+    const up = v.map((n, i) => ({ n, i })).filter(x => x.n != null && x.i >= Math.max(0, ri));
+    const seq = up.concat(up.slice(1, -1).reverse());
+    for (let k = 0; k < E; k++) { const x = seq[k % seq.length]; note(k, 'a' + x.i, x.n, k === 0 ? 0.75 : 0.58); }
+  }
+  // Up-strum: walk the bass into the next chord over the last eighths of the block.
+  if (dir === 'up') {
+    const walk = bassWalk(chord, nextChordFor(t));
+    if (walk.length) {
+      const from = E - walk.length;
+      for (let i = ev.length - 1; i >= 0; i--) if (ev[i].k >= from && ev[i].k > 0) ev.splice(i, 1);
+      walk.forEach((n, i) => note(from + i, 'bass', n, 0.75));
+    }
+  }
+  return ev.map(x => ({ t: performance.now() + x.k * e8, fn: x.fn }));
+}
+function playStyled(chord, dir, vel, t) {
+  if (S.strumStyle === 'plain' || !S.samples || !S.audio) { strumChord(chord, dir, vel); return; }
+  const ev = stylePlan(chord, dir, vel, t);
+  S.stylePat = ev;              // replaces (cuts off) whatever was left of the last pattern
+  styleTick();
+  if (!S.styleTimer) S.styleTimer = setInterval(styleTick, STYLE_TICK_MS);
+}
+function styleTick() {
+  const ev = S.stylePat; if (!ev || !S.audio) return;
+  const now = performance.now();
+  while (ev.length && ev[0].t < now + STYLE_AHEAD_MS) {
+    const e = ev.shift();
+    e.fn(S.audio.currentTime + Math.max(0.003, (e.t - now) / 1000));
+  }
 }
 // Finger mode: like a real guitar — play exactly the note each string reports, right away;
 // a new note on a string cuts off that string's previous note.
@@ -1267,6 +1373,8 @@ $('chord-reset-btn').onclick = () => chordReset();
 $('fret-layout').value = S.fretLayout;
 $('fret-layout').onchange = e => { S.fretLayout = e.target.value; store.set('fretLayout', S.fretLayout); applySongLayout(); };
 $('strum-level').value = S.strumLevel;
+$('strum-style').value = S.strumStyle;
+$('strum-style').onchange = e => { S.strumStyle = e.target.value; store.set('strumStyle', S.strumStyle); S.stylePat = null; };
 $('strum-level').onchange = e => { S.strumLevel = e.target.value; store.set('strumLevel', S.strumLevel); };
 $('backing').onchange = e => { S.backing = e.target.checked; store.set('backing', S.backing); if (S.backing) loadSamples(); };
 $('vol').value = S.volume;
