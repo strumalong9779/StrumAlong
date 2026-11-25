@@ -3,6 +3,9 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.3.1 — November 2026
+- The hosted site now keeps an anonymous visit count with GoatCounter (no cookies, nothing personal), so we can tell whether anyone uses it. Copies run from your own computer are not counted.
+
 ## 1.3.0 — November 2026
 - New **Strum style** (Settings, for Computer sound): you strum once per block and the computer plays a pattern: Plain strum, Boom-chuck, Fingerpick or Arpeggio. It keeps to the song's tempo in Fixed tempo and to your own pace in Follow me; strumming harder plays louder.
 - Guides now say plainly: iPhone and iPad can't work (any browser); Android is untested.

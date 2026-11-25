@@ -1,6 +1,6 @@
 # StrumAlong
 
-**Version 1.3.0** (November 2026) · see `CHANGELOG.md`
+**Version 1.3.1** (November 2026) · see `CHANGELOG.md`
 
 > **⚠️ Disclaimer:** StrumAlong is an independent, unofficial project. It is not made, endorsed, supported or approved by AeroBand or Anthropic.
 > It is provided free and "as is", without warranty of any kind. It does not change the guitar's firmware, but it does change guitar settings
@@ -33,6 +33,8 @@ and can **follow your pace**: the song waits for your strum instead of racing ah
 **Strum style:** with Computer sound, pick **Fingerpick**, **Boom-chuck** or **Arpeggio** in Settings: you strum once per block and the computer plays the pattern. Strum up instead of down for a bass walk into the next chord.
 
 Opening `index.html` by double-clicking won't work: browsers only allow Bluetooth on `https://` or `http://localhost` pages.
+
+**Privacy:** no accounts, no cookies. The hosted site keeps an anonymous visit count (GoatCounter) so we know whether anyone uses it; nothing you play is sent anywhere, and copies run from your own computer aren't counted.
 
 ## Credits
 
