@@ -26,6 +26,7 @@
    - **Just use it (most people):** the app is hosted online by GitHub and runs in Chrome. Nothing to install. **[Open StrumAlong →](https://strumalong9779.github.io/StrumAlong/)**
    - **Want the source code, or to run it on your own computer?** Download the full package (`StrumAlong-x.y.z.zip`) from the **[latest release](https://github.com/strumalong9779/StrumAlong/releases/latest)** and unzip it. Then on a Mac double-click `Start StrumAlong (Mac).command` (the first time, right-click it and choose Open); on Windows double-click `Start StrumAlong (Windows).bat` (needs Python from python.org). These start a small local server, because browsers only allow Bluetooth on `https://` or `http://localhost` pages; just double-clicking `index.html` won't work.
 3. Turn the guitar on, close the AeroBand phone app, click **💡 Connect**, pick the guitar in the list.
+   - ⚠️ **Don't pair the guitar in your computer's Bluetooth settings.** Connect only with StrumAlong's **💡 Connect** button: Chrome has its own Bluetooth link to the guitar, separate from your Mac's or PC's Bluetooth menu, and the **Pair** button in Chrome's pop-up list is the right one. If the guitar is already paired in System Settings → Bluetooth (Mac) or Settings → Bluetooth & devices (Windows), choose **Forget** / **Remove device** there first.
 4. Choose a song, press **Start**, strum.
 5. **Done?** Click **💡 Connected** (or Settings → ↺ Chord reset & disconnect) to put the guitar back the way it came.
 
