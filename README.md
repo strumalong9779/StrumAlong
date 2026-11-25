@@ -12,7 +12,7 @@ A free, open-source **companion app for the AeroBand smart guitar** (also called
 It lights the guitar's frets for each chord, shows the words and a scrolling chord chart on a big screen,
 and can **follow your pace**: the song waits for your strum instead of racing ahead.
 
-![StrumAlong playing Kumbaya: the chord to play now, a scrolling chord chart, the words, and the guitar's lit frets](docs/screenshot.png)
+![StrumAlong playing Kumbaya: the chord to play now, the scrolling chord chart and the words, with the new Voice slider, Strum styles and Vocals highlighted](docs/screenshot.png)
 
 - No install, no drivers, no AeroBand phone app needed.
 - Works with the guitar over Bluetooth, straight from the browser.
