@@ -49,7 +49,7 @@ observed from the guitar's own Bluetooth traffic, for interoperability; use at y
 ## Why it exists, and contributing
 
 We think the AeroBand guitar is a great product. StrumAlong is meant to enhance it, not compete with it: a big-screen way to
-learn and play that we hope brings more people to the guitar. AeroBand's own input is welcome.
+learn and play that we hope brings more people to the guitar.
 
 Contributions are welcome: open an **Issue** for bugs and ideas, or send a **pull request** with fixes, features or
 public-domain songs. For guitar commands, only use ones seen from the official app, and test one change at a time.
