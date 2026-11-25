@@ -2,6 +2,10 @@
 
 **Version 1.3.1** (November 2026) · see `CHANGELOG.md`
 
+![Visits to the StrumAlong site](https://strumalong.goatcounter.com/counter/TOTAL.svg)
+
+*Total visits to the hosted app ([strumalong9779.github.io/StrumAlong](https://strumalong9779.github.io/StrumAlong/)), counted anonymously by GoatCounter; updates every few hours.*
+
 > **⚠️ Disclaimer:** StrumAlong is an independent, unofficial project. It is not made, endorsed, supported or approved by AeroBand or Anthropic.
 > It is provided free and "as is", without warranty of any kind. It does not change the guitar's firmware, but it does change guitar settings
 > (mode, lights, Easy Chord layout). **Use it entirely at your own risk**; the authors accept no liability for any damage, malfunction,
