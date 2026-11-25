@@ -2,10 +2,6 @@
 
 **Version 1.4.0** (November 2026) · see `CHANGELOG.md`
 
-![Visits to the StrumAlong site](https://strumalong.goatcounter.com/counter/TOTAL.svg)
-
-*Total visits to the hosted app ([strumalong9779.github.io/StrumAlong](https://strumalong9779.github.io/StrumAlong/)), counted anonymously by GoatCounter; updates every few hours.*
-
 *Unofficial project, free and as-is: use at your own risk. See the [Disclaimer](#disclaimer) at the bottom.*
 
 **If you're learning guitar, just starting out, or just want to make some music, StrumAlong is here.** It's a free, open-source companion app for the **AeroBand smart guitar** (also called the Aero Guitar) that gets you playing real songs from your very first strum. It lights the fret to press for each chord, shows the chords and words big on your computer screen, and **waits for you**: the song only moves on when you strum, so you learn at your own pace. Already play? It works for you too. Runs in Google Chrome on a Mac or Windows computer.
@@ -66,3 +62,9 @@ License: MIT (see `LICENSE`).
 > (mode, lights, Easy Chord layout). **Use it entirely at your own risk**; the authors accept no liability for any damage, malfunction,
 > voided warranty or other problem. These settings stay on the guitar after it is switched off; StrumAlong's **Chord reset** button (or the official AeroBand app) puts them back. "AeroBand" is a trademark of its owner,
 > used only to say which guitar this works with. **By using StrumAlong, you agree to these terms.** If you don't agree, don't use it.
+
+## Visits
+
+![Visits to the StrumAlong site](https://strumalong.goatcounter.com/counter/TOTAL.svg)
+
+*Total visits to the hosted app ([strumalong9779.github.io/StrumAlong](https://strumalong9779.github.io/StrumAlong/)), counted anonymously by GoatCounter; updates every few hours.*
