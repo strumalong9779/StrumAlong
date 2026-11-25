@@ -22,8 +22,8 @@ and can **follow your pace**: the song waits for your strum instead of racing ah
 
 1. Use **Chrome or Edge** on a Mac or Windows computer with Bluetooth. (Safari and Firefox can't talk to Bluetooth devices.) **Not iPhone or iPad**, in any browser: Apple's browser engine can't reach Bluetooth devices. **Android** tablets with Chrome: untested.
 2. Open the app:
-   - **Hosted:** open **https://strumalong9779.github.io/StrumAlong/** in Chrome or Edge. Nothing to install.
-   - **Downloaded:** get the latest `StrumAlong-x.y.z.zip` from this project's **Releases** page and unzip it. Mac: double-click `Start StrumAlong (Mac).command` (the first time, right-click it and choose Open). Windows: double-click `Start StrumAlong (Windows).bat` (needs Python from python.org).
+   - **Just use it (most people):** the app is hosted online and runs in Chrome or Edge. Nothing to install. **[Open StrumAlong →](https://strumalong9779.github.io/StrumAlong/)**
+   - **Want the source code, or to run it on your own computer?** Download the full package (`StrumAlong-x.y.z.zip`) from the **[latest release](https://github.com/strumalong9779/StrumAlong/releases/latest)** and unzip it. Then on a Mac double-click `Start StrumAlong (Mac).command` (the first time, right-click it and choose Open); on Windows double-click `Start StrumAlong (Windows).bat` (needs Python from python.org). These start a small local server, because browsers only allow Bluetooth on `https://` or `http://localhost` pages; just double-clicking `index.html` won't work.
 3. Turn the guitar on, close the AeroBand phone app, click **💡 Connect**, pick the guitar in the list.
 4. Choose a song, press **Start**, strum.
 5. **Done?** Click **💡 Connected** (or Settings → ↺ Chord reset & disconnect) to put the guitar back the way it came.
@@ -31,8 +31,6 @@ and can **follow your pace**: the song waits for your strum instead of racing ah
 **Sound:** normally the sound comes out of the **computer**, not the guitar: choose **Computer** (a clean strum of the chord you meant) or **Natural** (exactly what you play), and turn the guitar's volume knob down. **Guitar** uses the guitar's own speaker; **Silent** plays nothing. The user guide explains each one.
 
 **Strum style:** with Computer sound, pick **Fingerpick**, **Boom-chuck** or **Arpeggio** in Settings: you strum once per block and the computer plays the pattern. Strum up instead of down for a bass walk into the next chord.
-
-Opening `index.html` by double-clicking won't work: browsers only allow Bluetooth on `https://` or `http://localhost` pages.
 
 **Privacy:** no accounts, no cookies. The hosted site keeps an anonymous visit count (GoatCounter) so we know whether anyone uses it; nothing you play is sent anywhere, and copies run from your own computer aren't counted.
 
