@@ -133,6 +133,9 @@
   <label class="ctl" title="Loudness of the computer sound">Vol
     <input id="vol" type="range" min="0.5" max="4" step="0.1" style="width:90px;accent-color:#5ac8f0">
   </label>
+  <label class="ctl hidden" id="voice-ctl" title="The singer's loudness compared with the guitar: left = more guitar, right = more voice">Voice
+    <input id="voice-lvl" type="range" min="0" max="1.5" step="0.05" style="width:90px;accent-color:#f2a65a">
+  </label>
   <span class="sep"></span>
   <label class="ctl" id="tempo-ctl">Tempo
     <input id="tempo" type="range" min="30" max="80" step="1">
@@ -159,6 +162,7 @@
         <select id="spb"><option selected>2</option><option>4</option></select>
       </label>
       <label class="ctl" title="Play the tune during Listen and Fixed tempo"><input type="checkbox" id="melody" checked> Melody</label>
+      <label class="ctl hidden" id="vocals-ctl" title="Songs with a recorded singer: the words are sung during Listen and Fixed tempo (instead of the Melody tune). Not in Follow me."><input type="checkbox" id="vocals" checked> Vocals</label>
       <label class="ctl" id="click-ctl"><input type="checkbox" id="click" checked> Click (Fixed tempo)</label>
       <label class="ctl" id="backing-ctl" title="Fixed tempo: the computer plays the chords (like Listen) while you play along"><input type="checkbox" id="backing"> Backing (Fixed tempo)</label>
       <div class="tools"><button id="chord-reset-btn" title="Put the guitar back the way it came: factory chords on the frets (C Dm Em F G Am Bdim), Easy Chord on, its own light colours. Then disconnects. Do this before going back to the AeroBand app.">↺ Chord reset &amp; disconnect</button></div>

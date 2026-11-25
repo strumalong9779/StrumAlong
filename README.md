@@ -1,6 +1,6 @@
 # StrumAlong
 
-**Version 1.3.1** (November 2026) · see `CHANGELOG.md`
+**Version 1.4.0** (November 2026) · see `CHANGELOG.md`
 
 ![Visits to the StrumAlong site](https://strumalong.goatcounter.com/counter/TOTAL.svg)
 
@@ -17,6 +17,7 @@ and can **follow your pace**: the song waits for your strum instead of racing ah
 - No install, no drivers, no AeroBand phone app needed.
 - Works with the guitar over Bluetooth, straight from the browser.
 - Bring your own songs: drop a chord sheet (text or ChordPro) on the window.
+- **New in 1.4: hear it sung.** Kumbaya now comes with a sung vocal (an AI singer) that sings along with the chords in Listen and Fixed tempo, so you can hear how the words fit the strums. A **Voice** slider sets the singer against the guitar. More songs to follow.
 
 **Guides:** `docs/StrumAlong-Quick-Start.pdf` (first use, 2 pages), `docs/StrumAlong-User-Guide.pdf` (how to play) and `docs/StrumAlong-Technical-Guide.pdf` (how it works, how to change it).
 
@@ -41,6 +42,7 @@ and can **follow your pace**: the song waits for your strum instead of racing ah
 - Written with **Claude Opus 5.5** (Anthropic's AI), at the direction of, and tested by, the project's human author.
 - Guitar sound: FluidR3_GM soundfont by Frank Wen, CC BY 3.0, served by gleitz/midi-js-soundfonts.
 - Built-in songs are traditional, public-domain tunes.
+- Kumbaya's vocal is sung by **TIGER DS**, a free AI singing voice by tigermeat (licence CC BY-NC-ND 4.0 with Commons Clause: free for non-commercial use), rendered with **OpenUtau** (free, MIT licence). The vocal recording (`songs/vocals/kumbaya.mp3`) is not covered by StrumAlong's MIT licence: share it only non-commercially, with this credit.
 
 ## Not affiliated
 

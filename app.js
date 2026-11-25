@@ -2,7 +2,7 @@
 // Listens to the guitar's Bluetooth/USB MIDI, works out which chord each strum was and when,
 // lights the frets, plays the sound, and shows the song, the fret to press and timing feedback.
 'use strict';
-const APP_VERSION = '1.3.1';   // bump this for every release, and add a line to CHANGELOG.md
+const APP_VERSION = '1.4.0';   // bump this for every release, and add a line to CHANGELOG.md
 
 // ---------- constants ----------
 const FRET_COLORS = { 1:'#34c759', 2:'#2f6fe0', 3:'#e5443b', 4:'#9b59e0', 5:'#62cdf5', 6:'#f5d33d', 7:'#f26fb4' };
@@ -52,6 +52,8 @@ const S = {
   tempo: store.get('tempo', 50),
   spb: [2, 4].includes(store.get('spb', 2)) ? store.get('spb', 2) : 2,
   melodyOn: store.get('melody', true), melody: [], melNext: 0,
+  vocalsOn: store.get('vocals', true),          // play the song's recorded singer (song.vocal) in Listen / Fixed tempo
+  voiceLevel: store.get('voiceLevel', 0.5),     // the singer's loudness relative to the guitar (Voice slider)
   click: store.get('click', true),
   backing: store.get('backing', false),          // Fixed tempo: the Mac strums the chords along with you
   strumLevel: store.get('strumLevel', 'easy'),   // easy / medium / full strum pattern
@@ -93,8 +95,10 @@ function buildSlots() {
                 : Math.max(1, Math.round(S.spb * cb / bpb)), step = cb / perCell;
   const verses = song.verses.map((v, i) => i).filter(i => S.verse === 'all' || String(i) === String(S.verse));
   let beat = 0;
+  const segs = [];
   verses.forEach(vi => {
     const verse = song.verses[vi], vStart = beat;
+    segs.push({ vi, vStart });
     song.lines.forEach((cells, li) => cells.forEach(([chord, w], ci) => {
       const word = fillWords(w, verse);
       for (let k = 0; k < perCell; k++) {
@@ -110,6 +114,10 @@ function buildSlots() {
     }
   });
   S.slots = out; S.melody = mel; S.melNext = 0; S.slotBeats = step;
+  // Where each verse lives in the song's vocal recording (all verses back to back, each starting at its pickup).
+  const vb = song.lines.reduce((a, l) => a + l.length * cb, 0), vs = song.vocal?.start ?? (song.melodyStart || 0);
+  S.voxSegs = segs.map((g, i) => ({ a: g.vStart + vs, b: i < segs.length - 1 ? segs[i + 1].vStart + vs : Infinity,
+                                     off: g.vi * (song.vocal?.verseBeats || vb) }));
 }
 function resetRun() {
   buildSlots();
@@ -548,7 +556,7 @@ function anchorClock() {
   S.nextBeat = -bpb;   // beat numbers relative to t0; negatives are the count-in
   S.melNext = 0; S.demoTick = 0;
   if (S.backing && S.mode === 'fixed') loadSamples();
-  if (S.melodyOn) loadSamples();
+  if (S.melodyOn || voxOn()) loadSamples();
 }
 // Listen: the Mac plays the whole song at the tempo slider's speed.
 async function listen() {
@@ -590,6 +598,7 @@ function setTempo(v) {
   renderControls();
 }
 function scheduleMelody() {
+  if (voxOn()) return;   // the singer carries the tune
   if (!S.melodyOn || !S.audio || !S.samples || !timed() || !S.melody.length) return;
   const now = performance.now(), bm = beatMs();
   while (S.melNext < S.melody.length && S.t0 + S.melody[S.melNext].beat * bm < now + 120) {
@@ -658,6 +667,45 @@ function scheduleDemo() {
   }
 }
 
+// ---------- sung vocal (song.vocal: a recorded singer, made with OpenUtau; see the song's vocal.credit) ----------
+// One audio file with every verse sung back to back at vocal.bpm. It follows the song clock in Listen and
+// Fixed tempo, sped up or slowed to the Tempo slider without changing pitch. Off in Follow me (a singer can't wait).
+const voxOn = () => S.vocalsOn && !!S.song?.vocal;
+function voxEl() {
+  if (S.vox) return S.vox;
+  const a = new Audio(); a.preload = 'auto'; a.preservesPitch = true; S.vox = a;
+  try {   // route through the app's mixer so it follows the volume slider and the chosen speakers
+    if (S.audio && S.master) {
+      const n = S.audio.createMediaElementSource(a); S.voxGain = S.audio.createGain(); S.voxGain.gain.value = S.voiceLevel;
+      n.connect(S.voxGain).connect(S.master);
+    } else a.volume = Math.min(1, S.voiceLevel);
+  } catch {}
+  return a;
+}
+function voxTarget() {   // seconds into the recording for the current song position, or null
+  const v = S.song.vocal, b = (performance.now() - S.t0) / beatMs();
+  for (const g of S.voxSegs || []) if (b >= g.a && b < g.b) return (b - g.a + g.off) * 60 / v.bpm;
+  return null;
+}
+function voxTick() {
+  const a = S.vox;
+  if (!voxOn() || !timed()) { if (a && !a.paused) a.pause(); return; }
+  const v = S.song.vocal, el = voxEl(), src = 'songs/' + v.file;
+  if (el.dataset.src !== src) {   // load the whole file into memory first: then it can jump anywhere on any web server
+    el.dataset.src = src; el.dataset.ready = '';
+    fetch(src).then(r => r.ok ? r.blob() : null).then(bl => {
+      if (bl && el.dataset.src === src) { if (el.src.startsWith('blob:')) URL.revokeObjectURL(el.src); el.src = URL.createObjectURL(bl); el.dataset.ready = '1'; }
+    }).catch(() => {});
+  }
+  if (el.dataset.ready !== '1') return;
+  const t = voxTarget();
+  if (t == null || (el.duration && t >= el.duration - 0.05)) { if (!el.paused) el.pause(); return; }
+  const rate = S.tempo / v.bpm;
+  if (Math.abs(el.playbackRate - rate) > 1e-3) el.playbackRate = rate;
+  if (el.paused) { el.currentTime = t; el.play().catch(() => {}); return; }
+  if (Math.abs(el.currentTime - t) > 0.15) el.currentTime = t;   // drifted (tempo change, verse jump): re-sync
+}
+
 // ---------- metronome ----------
 function scheduleClicks() {
   if (!S.audio || !timed()) return;
@@ -692,8 +740,9 @@ function renderControls() {
   document.querySelectorAll('#mode-seg button').forEach(b => b.classList.toggle('on', b.dataset.mode === S.mode));
   document.querySelectorAll('#sound-seg button').forEach(b => b.classList.toggle('on', b.dataset.sound === S.sound));
   const normal = S.song?.normalTempo || 80;
-  const tr = $('tempo'); tr.max = normal; tr.min = Math.max(20, Math.round(normal * 0.35)); tr.value = Math.min(S.tempo, normal);
-  $('tempo-val').textContent = `${S.tempo} BPM` + (S.tempo >= normal ? ' (normal)' : ` · ${Math.round(100 * S.tempo / normal)}%`);
+  // The slider goes past the song's normal speed (up to 150%) for anyone who likes it faster.
+  const tr = $('tempo'); tr.max = Math.round(normal * 1.5); tr.min = Math.max(20, Math.round(normal * 0.35)); tr.value = Math.min(S.tempo, +tr.max);
+  $('tempo-val').textContent = `${S.tempo} BPM` + (S.tempo === normal ? ' (normal)' : ` · ${Math.round(100 * S.tempo / normal)}%`);
   const free = S.mode === 'free';
   $('tempo-ctl').classList.toggle('hidden', free);   // tempo applies to Fixed tempo and Listen
   ['start', 'listen', 'restart', 'verse-pick'].forEach(id => $(id).classList.toggle('hidden', free));
@@ -704,6 +753,8 @@ function renderControls() {
   $('spb').value = String(S.spb);
   $('click').checked = S.click;
   $('melody').checked = S.melodyOn;
+  $('vocals').checked = S.vocalsOn; $('vocals-ctl').classList.toggle('hidden', !S.song?.vocal);
+  $('voice-ctl').classList.toggle('hidden', !S.song?.vocal || !S.vocalsOn);
 }
 
 // Natural mode: the six strings and the last note each one played (fades after a few seconds).
@@ -950,6 +1001,7 @@ function loop() {
   scheduleClicks();
   scheduleDemo();
   scheduleMelody();
+  voxTick();
   lightsTick();
   drawLane();
   renderNow();
@@ -1378,8 +1430,12 @@ $('strum-style').onchange = e => { S.strumStyle = e.target.value; store.set('str
 $('strum-level').onchange = e => { S.strumLevel = e.target.value; store.set('strumLevel', S.strumLevel); };
 $('backing').onchange = e => { S.backing = e.target.checked; store.set('backing', S.backing); if (S.backing) loadSamples(); };
 $('vol').value = S.volume;
+$('voice-lvl').value = S.voiceLevel;
+$('voice-lvl').oninput = e => { S.voiceLevel = +e.target.value; store.set('voiceLevel', S.voiceLevel);
+  if (S.voxGain) S.voxGain.gain.value = S.voiceLevel; else if (S.vox) S.vox.volume = Math.min(1, S.voiceLevel); };
 $('vol').oninput = e => { S.volume = +e.target.value; store.set('volume', S.volume); if (S.vol) S.vol.gain.value = S.volume; };
 $('melody').onchange = e => { S.melodyOn = e.target.checked; store.set('melody', S.melodyOn); if (S.melodyOn) loadSamples(); };
+$('vocals').onchange = e => { S.vocalsOn = e.target.checked; store.set('vocals', S.vocalsOn); if (S.vocalsOn) loadSamples(); renderControls(); };
 $('verse-pick').onchange = e => { S.verse = e.target.value; store.set('verse', S.verse); resetRun(); };
 $('song-pick').onchange = e => {
   const v = e.target.value;

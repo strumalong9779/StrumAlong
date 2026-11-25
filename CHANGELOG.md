@@ -3,6 +3,12 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.4.0 — November 2026
+- **Hear it sung:** Kumbaya now has a sung vocal (TIGER DS, a free AI singer, made with OpenUtau). Tick **Vocals** in Settings: the singer sings along in Listen and Fixed tempo, follows the Tempo slider without changing pitch, and jumps to the verse you pick. It replaces the Melody tune while it sings; it stays off in Follow me.
+- New **Voice** slider (next to Vol, on songs with a singer) to balance the singer against the guitar.
+- The Tempo slider now goes up to 150% of a song's normal speed.
+- Kumbaya's normal speed is now 120 BPM (it was 88, which felt slow).
+
 ## 1.3.1 — November 2026
 - The hosted site now keeps an anonymous visit count with GoatCounter (no cookies, nothing personal), so we can tell whether anyone uses it. Copies run from your own computer are not counted.
 
