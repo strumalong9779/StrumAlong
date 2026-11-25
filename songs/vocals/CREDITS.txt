@@ -1,0 +1,8 @@
+kumbaya.mp3
+
+Sung by TIGER DS, a free AI singing voice by tigermeat (https://github.com/spicytigermeat/tiger_diffsinger).
+Voice licence: CC BY-NC-ND 4.0 with Commons Clause - free for non-commercial use only.
+Rendered with OpenUtau (https://github.com/openutau/OpenUtau, MIT licence).
+Song: Kumbaya, traditional (public domain).
+
+This recording is NOT covered by StrumAlong's MIT licence. Share it only for non-commercial use, with this credit.
