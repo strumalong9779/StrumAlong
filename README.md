@@ -6,11 +6,7 @@
 
 *Total visits to the hosted app ([strumalong9779.github.io/StrumAlong](https://strumalong9779.github.io/StrumAlong/)), counted anonymously by GoatCounter; updates every few hours.*
 
-> **⚠️ Disclaimer:** StrumAlong is an independent, unofficial project. It is not made, endorsed, supported or approved by AeroBand or Anthropic.
-> It is provided free and "as is", without warranty of any kind. It does not change the guitar's firmware, but it does change guitar settings
-> (mode, lights, Easy Chord layout). **Use it entirely at your own risk**; the authors accept no liability for any damage, malfunction,
-> voided warranty or other problem. These settings stay on the guitar after it is switched off; StrumAlong's **Chord reset** button (or the official AeroBand app) puts them back. "AeroBand" is a trademark of its owner,
-> used only to say which guitar this works with. **By using StrumAlong, you agree to these terms.** If you don't agree, don't use it.
+*Unofficial project, free and as-is: use at your own risk. See the [Disclaimer](#disclaimer) at the bottom.*
 
 A free, open-source **companion app for the AeroBand smart guitar** (also called the Aero Guitar), running in Chrome or Edge on a Mac or Windows computer. An easier way to learn and play songs on your AeroBand guitar, on a big screen.
 It lights the guitar's frets for each chord, shows the words and a scrolling chord chart on a big screen,
@@ -61,3 +57,11 @@ Contributions are welcome: open an **Issue** for bugs and ideas, or send a **pul
 public-domain songs. For guitar commands, only use ones seen from the official app, and test one change at a time.
 
 License: MIT (see `LICENSE`).
+
+## Disclaimer
+
+> StrumAlong is an independent, unofficial project. It is not made, endorsed, supported or approved by AeroBand or Anthropic.
+> It is provided free and "as is", without warranty of any kind. It does not change the guitar's firmware, but it does change guitar settings
+> (mode, lights, Easy Chord layout). **Use it entirely at your own risk**; the authors accept no liability for any damage, malfunction,
+> voided warranty or other problem. These settings stay on the guitar after it is switched off; StrumAlong's **Chord reset** button (or the official AeroBand app) puts them back. "AeroBand" is a trademark of its owner,
+> used only to say which guitar this works with. **By using StrumAlong, you agree to these terms.** If you don't agree, don't use it.
