@@ -8,9 +8,7 @@
 
 *Unofficial project, free and as-is: use at your own risk. See the [Disclaimer](#disclaimer) at the bottom.*
 
-A free, open-source **companion app for the AeroBand smart guitar** (also called the Aero Guitar), running in Google Chrome on a Mac or Windows computer. An easier way to learn and play songs on your AeroBand guitar, on a big screen.
-It lights the guitar's frets for each chord, shows the words and a scrolling chord chart on a big screen,
-and can **follow your pace**: the song waits for your strum instead of racing ahead.
+**If you're learning to play the guitar or just starting out, StrumAlong is here.** It's a free, open-source companion app for the **AeroBand smart guitar** (also called the Aero Guitar) that gets you playing real songs from your very first strum. It lights the fret to press for each chord, shows the chords and words big on your computer screen, and **waits for you**: the song only moves on when you strum, so you learn at your own pace. Already play? It works for you too. Runs in Google Chrome on a Mac or Windows computer.
 
 ![StrumAlong playing Kumbaya: the chord to play now, the scrolling chord chart and the words, with the new Voice slider, Strum styles and Vocals highlighted](docs/screenshot.png)
 
