@@ -8,7 +8,7 @@
 
 *Unofficial project, free and as-is: use at your own risk. See the [Disclaimer](#disclaimer) at the bottom.*
 
-A free, open-source **companion app for the AeroBand smart guitar** (also called the Aero Guitar), running in Chrome or Edge on a Mac or Windows computer. An easier way to learn and play songs on your AeroBand guitar, on a big screen.
+A free, open-source **companion app for the AeroBand smart guitar** (also called the Aero Guitar), running in Google Chrome on a Mac or Windows computer. An easier way to learn and play songs on your AeroBand guitar, on a big screen.
 It lights the guitar's frets for each chord, shows the words and a scrolling chord chart on a big screen,
 and can **follow your pace**: the song waits for your strum instead of racing ahead.
 
@@ -22,9 +22,9 @@ and can **follow your pace**: the song waits for your strum instead of racing ah
 
 ## Quick start
 
-1. Use **Chrome or Edge** on a Mac or Windows computer with Bluetooth. (Safari and Firefox can't talk to Bluetooth devices.) **Not iPhone or iPad**, in any browser: Apple's browser engine can't reach Bluetooth devices. **Android** tablets with Chrome: untested.
+1. Use an **up-to-date Google Chrome** on a Mac or Windows computer with Bluetooth (in Chrome: menu → Help → About Google Chrome updates it). StrumAlong was built and tested in Chrome. Microsoft **Edge** uses the same engine and should work, but is untested. (Safari and Firefox can't talk to Bluetooth devices.) **Not iPhone or iPad**, in any browser: Apple's browser engine can't reach Bluetooth devices. **Android** tablets with Chrome: untested.
 2. Open the app:
-   - **Just use it (most people):** the app is hosted online by GitHub and runs in Chrome or Edge. Nothing to install. **[Open StrumAlong →](https://strumalong9779.github.io/StrumAlong/)**
+   - **Just use it (most people):** the app is hosted online by GitHub and runs in Chrome. Nothing to install. **[Open StrumAlong →](https://strumalong9779.github.io/StrumAlong/)**
    - **Want the source code, or to run it on your own computer?** Download the full package (`StrumAlong-x.y.z.zip`) from the **[latest release](https://github.com/strumalong9779/StrumAlong/releases/latest)** and unzip it. Then on a Mac double-click `Start StrumAlong (Mac).command` (the first time, right-click it and choose Open); on Windows double-click `Start StrumAlong (Windows).bat` (needs Python from python.org). These start a small local server, because browsers only allow Bluetooth on `https://` or `http://localhost` pages; just double-clicking `index.html` won't work.
 3. Turn the guitar on, close the AeroBand phone app, click **💡 Connect**, pick the guitar in the list.
 4. Choose a song, press **Start**, strum.
