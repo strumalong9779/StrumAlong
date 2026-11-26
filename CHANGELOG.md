@@ -3,6 +3,10 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.5.0 — November 2026
+- **Every built-in song is now sung:** Oh My Darling, Clementine; Oh! Susanna; Yankee Doodle and I've Been Working on the Railroad join Kumbaya (same free AI singer, TIGER DS, made with OpenUtau). Tick **Vocals** in Settings and press Listen or Fixed tempo.
+- I've Been Working on the Railroad now has its melody (the traditional tune, all the way through Dinah, the kitchen and fee-fi), so Melody mode plays it too. Its Dinah and kitchen lines are regrouped so the words show when they are sung.
+
 ## 1.4.0 — November 2026
 - **Hear it sung:** Kumbaya now has a sung vocal (TIGER DS, a free AI singer, made with OpenUtau). Tick **Vocals** in Settings: the singer sings along in Listen and Fixed tempo, follows the Tempo slider without changing pitch, and jumps to the verse you pick. It replaces the Melody tune while it sings; it stays off in Follow me.
 - New **Voice** slider (next to Vol, on songs with a singer) to balance the singer against the guitar.
