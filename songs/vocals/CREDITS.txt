@@ -1,8 +1,8 @@
-kumbaya.mp3
+kumbaya.mp3, clementine.mp3, oh-susanna.mp3, yankee-doodle.mp3, railroad.mp3
 
 Sung by TIGER DS, a free AI singing voice by tigermeat (https://github.com/spicytigermeat/tiger_diffsinger).
 Voice licence: CC BY-NC-ND 4.0 with Commons Clause - free for non-commercial use only.
 Rendered with OpenUtau (https://github.com/openutau/OpenUtau, MIT licence).
-Song: Kumbaya, traditional (public domain).
+Songs: Kumbaya, Oh My Darling Clementine, Oh! Susanna (Stephen Foster, 1848), Yankee Doodle and I've Been Working on the Railroad - all traditional/public domain.
 
-This recording is NOT covered by StrumAlong's MIT licence. Share it only for non-commercial use, with this credit.
+These recordings are NOT covered by StrumAlong's MIT licence. Share them only for non-commercial use, with this credit.
