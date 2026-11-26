@@ -1,6 +1,6 @@
 # StrumAlong
 
-**Version 1.5.0** (November 2026) · see `CHANGELOG.md`
+**Version 1.6.0** (November 2026) · see `CHANGELOG.md`
 
 *Unofficial project, free and as-is: use at your own risk. See the [Disclaimer](#disclaimer) at the bottom.*
 
@@ -11,6 +11,7 @@
 - No install, no drivers, no AeroBand phone app needed.
 - Works with the guitar over Bluetooth, straight from the browser.
 - Bring your own songs: drop a chord sheet (text or ChordPro) on the window.
+- **Jam with the band (new in 1.6):** drums and bass play along behind your strums (Folk, Country or Rock; each song picks a style), with a **Band** slider to mix them in.
 - **Hear it sung:** every built-in song (Kumbaya, Clementine, Oh! Susanna, Yankee Doodle and I've Been Working on the Railroad) comes with a sung vocal (an AI singer) that sings along with the chords in Listen and Fixed tempo, so you can hear how the words fit the strums. A **Voice** slider sets the singer against the guitar.
 
 **Guides:** `docs/StrumAlong-Quick-Start.pdf` (first use, 2 pages), `docs/StrumAlong-User-Guide.pdf` (how to play) and `docs/StrumAlong-Technical-Guide.pdf` (how it works, how to change it).
@@ -35,7 +36,7 @@
 ## Credits
 
 - Written with **Claude Opus 5.5** (Anthropic's AI), at the direction of, and tested by, the project's human author.
-- Guitar sound: FluidR3_GM soundfont by Frank Wen, CC BY 3.0, served by gleitz/midi-js-soundfonts.
+- Guitar and bass sounds: FluidR3_GM soundfont by Frank Wen, CC BY 3.0, served by gleitz/midi-js-soundfonts. Drums are synthesized in the browser.
 - Built-in songs are traditional, public-domain tunes.
 - The song vocals are sung by **TIGER DS**, a free AI singing voice by tigermeat (licence CC BY-NC-ND 4.0 with Commons Clause: free for non-commercial use), rendered with **OpenUtau** (free, MIT licence). The vocal recordings (`songs/vocals/*.mp3`) are not covered by StrumAlong's MIT licence: share them only non-commercially, with this credit.
 

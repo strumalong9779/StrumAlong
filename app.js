@@ -2,7 +2,7 @@
 // Listens to the guitar's Bluetooth/USB MIDI, works out which chord each strum was and when,
 // lights the frets, plays the sound, and shows the song, the fret to press and timing feedback.
 'use strict';
-const APP_VERSION = '1.5.0';   // bump this for every release, and add a line to CHANGELOG.md
+const APP_VERSION = '1.6.0';   // bump this for every release, and add a line to CHANGELOG.md
 
 // ---------- constants ----------
 const FRET_COLORS = { 1:'#34c759', 2:'#2f6fe0', 3:'#e5443b', 4:'#9b59e0', 5:'#62cdf5', 6:'#f5d33d', 7:'#f26fb4' };
@@ -54,6 +54,8 @@ const S = {
   melodyOn: store.get('melody', true), melody: [], melNext: 0,
   vocalsOn: store.get('vocals', true),          // play the song's recorded singer (song.vocal) in Listen / Fixed tempo
   voiceLevel: store.get('voiceLevel', 0.5),     // the singer's loudness relative to the guitar (Voice slider)
+  band: store.get('band', 'auto'),               // Jam with the band: auto (the song's style) / folk / country / rock / off
+  bandLevel: store.get('bandLevel', 0.7),        // the band's loudness (Band slider)
   click: store.get('click', true),
   backing: store.get('backing', false),          // Fixed tempo: the Mac strums the chords along with you
   strumLevel: store.get('strumLevel', 'easy'),   // easy / medium / full strum pattern
@@ -470,6 +472,7 @@ function onStrum(s) {
     if (!slot) return;
     if (s.chord === slot.chord) {
       slot.res = 'ok'; slot.heard = s.chord; slot.heardDir = s.dir; S.stats.ok++;
+      bandStrum(slot);
       S.lastOk = { t: performance.now(), chord: s.chord };   // for the blink-to-repeat light
       S.okTimes.push(s.t); if (S.okTimes.length > 6) S.okTimes.shift();
       S.pos++;
@@ -554,7 +557,8 @@ function anchorClock() {
   S.countInUntil = now + bpb * beatMs();
   S.t0 = S.countInUntil;
   S.nextBeat = -bpb;   // beat numbers relative to t0; negatives are the count-in
-  S.melNext = 0; S.demoTick = 0;
+  S.melNext = 0; S.demoTick = 0; S.bandTick = 0;
+  if (bandOn()) { loadSamples(); loadBass(); }
   if (S.backing && S.mode === 'fixed') loadSamples();
   if (S.melodyOn || voxOn()) loadSamples();
 }
@@ -592,6 +596,7 @@ function setTempo(v) {
     S.countInUntil = Math.min(S.countInUntil, now);
     S.nextBeat = Math.floor((now - S.t0) / beatMs()) + 1;
     if (backingOn()) S.demoTick = Math.max(S.demoTick || 0, Math.ceil(keep * (S.slotBeats || 1) * 2));
+    if (bandOn()) S.bandTick = Math.max(S.bandTick || 0, Math.ceil(keep * (S.slotBeats || 1) * 2));
     const mi = S.melody.findIndex(m => S.t0 + m.beat * beatMs() >= now);
     S.melNext = mi < 0 ? S.melody.length : mi;
   }
@@ -665,6 +670,154 @@ function scheduleDemo() {
     if (ch === 'D' || ch === 'U') strumChord(chord, ch === 'D' ? 'down' : 'up', vel, at);
     else if (ch === 'B' || ch === 'A') playBass(chord, ch === 'A', at, vel);
   }
+}
+
+// ---------- Jam with the band: drums + bass behind the guitar ----------
+// The band plays in Listen and Fixed tempo, following the song clock and the Tempo slider. In Follow me
+// (no clock: the song waits for you) each good strum gets a bass note and a drum hit instead.
+// Drums are made right here in the browser (no recordings to license); the bass is the FluidR3 acoustic
+// bass (same free CC BY 3.0 sound set as the guitar). Style "auto" = the song's own "band" setting.
+const BASS_URLS = [
+  'sounds/acoustic_bass-mp3.js',   // local copy, if present
+  'https://gleitz.github.io/midi-js-soundfonts/FluidR3_GM/acoustic_bass-mp3.js',
+  'https://cdn.jsdelivr.net/gh/gleitz/midi-js-soundfonts@gh-pages/FluidR3_GM/acoustic_bass-mp3.js',
+];
+// One bar, one character per eighth note. Lanes: K kick, S snare, B brush swish, H hi-hat / brush tap,
+// L bass (R = root, F = fifth). x = hit, o = soft hit, . = rest.
+const BAND_STYLES = {
+  folk: {
+    2: { K: 'o...', B: '..x.', H: 'o.o.', L: 'R.F.' },
+    3: { K: 'o.....', B: '..o.o.', H: 'o.o.o.', L: 'R...F.' },
+    4: { K: 'o...o...', B: '..x...x.', H: 'o.o.o.o.', L: 'R...F...' },
+  },
+  country: {   // the "train beat": boom-chick bass, snare on the back beat, steady eighths
+    2: { K: 'x...', S: '..x.', H: 'oxox', L: 'R.F.' },
+    3: { K: 'x.....', S: '..o.o.', H: 'oxoxox', L: 'R...F.' },
+    4: { K: 'x...x...', S: '..x...x.', H: 'oxoxoxox', L: 'R...F...' },
+  },
+  rock: {
+    2: { K: 'x.x.', S: '..x.', H: 'xxxx', L: 'RRRR' },
+    3: { K: 'x...x.', S: '..x...', H: 'xxxxxx', L: 'RRRRRR' },
+    4: { K: 'x...xx..', S: '..x...x.', H: 'xxxxxxxx', L: 'RRRRRRRR' },
+  },
+};
+const bandStyle = () => { const b = S.band === 'auto' ? (S.song?.band || 'folk') : S.band; return BAND_STYLES[b] ? b : null; };
+const bandOn = () => !!bandStyle();
+async function loadBass() {
+  if (S.bassState === 'loading' || S.bassState === 'ready') return;
+  ensureAudio(); if (!S.audio) return;
+  S.bassState = 'loading';
+  let text = null;
+  for (const u of BASS_URLS) { try { const r = await fetch(u); if (r.ok) { text = await r.text(); break; } } catch {} }
+  if (!text) { S.bassState = 'failed'; return; }
+  const re = /"([A-G]b?)(\d)":\s*"data:audio\/mp3;base64,([^"]+)"/g, out = {}, jobs = [];
+  let m;
+  while ((m = re.exec(text))) {
+    const midi = FLATS.indexOf(m[1]) + 12 * (+m[2] + 1);
+    if (midi < 24 || midi > 55) continue;
+    const b64 = m[3];
+    jobs.push((async () => {
+      const bin = atob(b64), bytes = new Uint8Array(bin.length);
+      for (let i = 0; i < bin.length; i++) bytes[i] = bin.charCodeAt(i);
+      try { out[midi] = await S.audio.decodeAudioData(bytes.buffer); } catch {}
+    })());
+  }
+  await Promise.all(jobs);
+  S.bassSamples = out; S.bassState = Object.keys(out).length ? 'ready' : 'failed';
+}
+function bandOut() {   // the band's own volume (Band slider), into the main mixer
+  if (!S.audio || !S.master) return null;
+  if (!S.bandGain) { S.bandGain = S.audio.createGain(); S.bandGain.gain.value = S.bandLevel; S.bandGain.connect(S.master); }
+  if (!S.noise) {
+    const n = S.audio.sampleRate, b = S.audio.createBuffer(1, n, n), d = b.getChannelData(0);
+    for (let i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+    S.noise = b;
+  }
+  return S.bandGain;
+}
+function noiseHit(at, lvl, type, freq, q, attack, decay) {
+  const out = bandOut(); if (!out) return;
+  const src = S.audio.createBufferSource(), f = S.audio.createBiquadFilter(), g = S.audio.createGain();
+  src.buffer = S.noise; src.playbackRate.value = 0.9 + Math.random() * 0.2;
+  f.type = type; f.frequency.value = freq; f.Q.value = q;
+  g.gain.setValueAtTime(0.0001, at);
+  g.gain.linearRampToValueAtTime(lvl, at + attack);
+  g.gain.exponentialRampToValueAtTime(0.0001, at + attack + decay);
+  src.connect(f).connect(g).connect(out);
+  src.start(at, Math.random() * 0.5); src.stop(at + attack + decay + 0.05);
+}
+function toneHit(at, lvl, type, f0, f1, decay) {
+  const out = bandOut(); if (!out) return;
+  const o = S.audio.createOscillator(), g = S.audio.createGain();
+  o.type = type; o.frequency.setValueAtTime(f0, at); o.frequency.exponentialRampToValueAtTime(f1, at + decay * 0.6);
+  g.gain.setValueAtTime(lvl, at); g.gain.exponentialRampToValueAtTime(0.0001, at + decay);
+  o.connect(g).connect(out); o.start(at); o.stop(at + decay + 0.05);
+}
+const DRUMS = {
+  K: (at, v) => { toneHit(at, 0.95 * v, 'sine', 120, 42, 0.38); noiseHit(at, 0.12 * v, 'highpass', 3000, 0.7, 0.001, 0.012); },
+  S: (at, v) => { toneHit(at, 0.22 * v, 'triangle', 200, 160, 0.11); noiseHit(at, 0.42 * v, 'bandpass', 1900, 0.8, 0.001, 0.17); },
+  B: (at, v) => noiseHit(at, 0.26 * v, 'bandpass', 3200, 0.6, 0.035, 0.22),
+  H: (at, v) => noiseHit(at, 0.12 * v, 'highpass', 7500, 0.8, 0.001, 0.045),
+};
+function bassNotes(chord) {   // root in the low bass range (E1..D#2), and its fifth
+  const pc = chordPCs(chord); if (!pc) return null;
+  let r = 24 + pc.root; if (r < 28) r += 12;
+  return { root: r, fifth: r + 7 <= 43 ? r + 7 : r - 5 };
+}
+function playBassNote(midi, at, dur, lvl) {
+  const out = bandOut(), s = S.bassSamples; if (!out || !s) return;
+  let m = null; for (let d = 0; d <= 3 && m == null; d++) for (const x of [midi - d, midi + d]) if (s[x]) { m = x; break; }
+  if (m == null) return;
+  const old = S.bassVoice;
+  if (old) { try { old.g.gain.setTargetAtTime(0, at, 0.02); old.src.stop(at + 0.15); } catch {} }
+  const src = S.audio.createBufferSource(), g = S.audio.createGain();
+  src.buffer = s[m]; src.playbackRate.value = Math.pow(2, (midi - m) / 12);
+  g.gain.setValueAtTime(lvl, at); g.gain.setTargetAtTime(0, at + Math.max(0.08, dur * 0.92), 0.05);
+  src.connect(g).connect(out); src.start(at); src.stop(at + dur + 0.6);
+  S.bassVoice = { src, g };
+}
+function scheduleBand() {
+  const st = bandStyle();
+  if (!st || !timed() || !S.audio || !S.slots.length || !bandOut()) return;
+  if (S.bassState !== 'ready') loadBass();
+  const bpb = S.song.beatsPerBar || 4, pat = BAND_STYLES[st][bpb] || BAND_STYLES[st][4];
+  const now = performance.now(), bm = beatMs(), n = bpb * 2;
+  const endBeat = S.slots[S.slots.length - 1].beat + (S.slotBeats || 1);
+  while ((S.bandTick || 0) < endBeat * 2) {
+    const k = S.bandTick || 0, swing = S.song.swing && k % 2 ? 1 / 6 : 0;
+    const beat = k / 2 + swing, tk = S.t0 + beat * bm;
+    if (tk > now + 120) break;
+    S.bandTick = k + 1;
+    if (tk < now - 30) continue;
+    const at = S.audio.currentTime + Math.max(0, (tk - now) / 1000), j = k % n;
+    for (const lane of ['K', 'S', 'B', 'H']) {
+      const c = pat[lane]?.[j];
+      if (c === 'x' || c === 'o') DRUMS[lane](at, c === 'x' ? 1 : 0.6);
+    }
+    const c = pat.L[j];
+    if (c === 'R' || c === 'F') {
+      const chord = chordAtBeat(beat), b = bassNotes(chord); if (!b) continue;
+      let note = c === 'F' ? b.fifth : b.root;
+      // walk up (or down) into the next chord when it changes within the next beat
+      const next = chordAtBeat(beat + 1);
+      if (next !== chord && chordAtBeat(beat - 0.5) === chord) {
+        const nb = bassNotes(next);
+        if (nb) { let t = nb.root; while (t - b.root > 6) t -= 12; while (b.root - t > 6) t += 12; note = t + (t > b.root ? -2 : t < b.root ? 2 : 0); if (note === t) note = b.fifth; }
+      }
+      let len = 1; while (len < n - j && pat.L[j + len] === '.') len++;
+      playBassNote(note, at, len * bm / 2000, c === 'R' ? 0.95 : 0.8);
+    }
+  }
+}
+// Follow me: no clock, so the band answers each good strum (bass on the beat, kick at the bar, brush otherwise).
+function bandStrum(slot) {
+  if (!bandOn() || !S.audio) return;
+  if (S.bassState !== 'ready') { loadBass(); return; }
+  if (!bandOut()) return;
+  const at = S.audio.currentTime + 0.005, b = bassNotes(slot.chord);
+  const first = slot.firstOfBar || slot.firstOfCell;
+  if (b) playBassNote((S.bandFlip = !S.bandFlip) || first ? b.root : b.fifth, at, 1.2, 0.9);
+  if (first) DRUMS.K(at, 0.9); else DRUMS[bandStyle() === 'folk' ? 'B' : 'S'](at, 0.8);
 }
 
 // ---------- sung vocal (song.vocal: a recorded singer, made with OpenUtau; see the song's vocal.credit) ----------
@@ -755,6 +908,7 @@ function renderControls() {
   $('melody').checked = S.melodyOn;
   $('vocals').checked = S.vocalsOn; $('vocals-ctl').classList.toggle('hidden', !S.song?.vocal);
   $('voice-ctl').classList.toggle('hidden', !S.song?.vocal || !S.vocalsOn);
+  $('band-ctl').classList.toggle('hidden', !bandOn());
 }
 
 // Natural mode: the six strings and the last note each one played (fades after a few seconds).
@@ -1000,6 +1154,7 @@ function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcT
 function loop() {
   scheduleClicks();
   scheduleDemo();
+  scheduleBand();
   scheduleMelody();
   voxTick();
   lightsTick();
@@ -1425,6 +1580,10 @@ $('chord-reset-btn').onclick = () => chordReset();
 $('fret-layout').value = S.fretLayout;
 $('fret-layout').onchange = e => { S.fretLayout = e.target.value; store.set('fretLayout', S.fretLayout); applySongLayout(); };
 $('strum-level').value = S.strumLevel;
+$('band').value = S.band;
+$('band').onchange = e => { S.band = e.target.value; store.set('band', S.band); if (bandOn()) { loadSamples(); loadBass(); } renderControls(); };
+$('band-lvl').value = S.bandLevel;
+$('band-lvl').oninput = e => { S.bandLevel = +e.target.value; store.set('bandLevel', S.bandLevel); if (S.bandGain) S.bandGain.gain.value = S.bandLevel; };
 $('strum-style').value = S.strumStyle;
 $('strum-style').onchange = e => { S.strumStyle = e.target.value; store.set('strumStyle', S.strumStyle); S.stylePat = null; };
 $('strum-level').onchange = e => { S.strumLevel = e.target.value; store.set('strumLevel', S.strumLevel); };

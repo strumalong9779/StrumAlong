@@ -3,6 +3,11 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.6.0 — November 2026
+- **Jam with the band:** drums and bass now play along behind the guitar, so the chords don't sound empty. Pick the style in ⚙ Settings → **Band**: Song style (each song picks its own), Folk (brushes), Country (train beat), Rock or Off. The new **Band** slider sets drums and bass against the guitar.
+- The band plays in Listen and Fixed tempo and follows the Tempo slider; the bass follows the chords and walks into the next one. In Follow me (no clock) each good strum gets a bass note and a drum hit instead.
+- Drums are made in the browser; the bass is the FluidR3 acoustic bass (same free sound set as the guitar).
+
 ## 1.5.0 — November 2026
 - **Every built-in song is now sung:** Oh My Darling, Clementine; Oh! Susanna; Yankee Doodle and I've Been Working on the Railroad join Kumbaya (same free AI singer, TIGER DS, made with OpenUtau). Tick **Vocals** in Settings and press Listen or Fixed tempo.
 - I've Been Working on the Railroad now has its melody (the traditional tune, all the way through Dinah, the kitchen and fee-fi), so Melody mode plays it too. Its Dinah and kitchen lines are regrouped so the words show when they are sung.

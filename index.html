@@ -136,6 +136,9 @@
   <label class="ctl hidden" id="voice-ctl" title="The singer's loudness compared with the guitar: left = more guitar, right = more voice">Voice
     <input id="voice-lvl" type="range" min="0" max="1.5" step="0.05" style="width:90px;accent-color:#f2a65a">
   </label>
+  <label class="ctl" id="band-ctl" title="Jam with the band: the drums and bass loudness compared with the guitar (pick the style in Settings)">Band
+    <input id="band-lvl" type="range" min="0" max="1.5" step="0.05" style="width:90px;accent-color:#8fd36b">
+  </label>
   <span class="sep"></span>
   <label class="ctl" id="tempo-ctl">Tempo
     <input id="tempo" type="range" min="30" max="80" step="1">
@@ -157,6 +160,9 @@
       </label>
       <label class="ctl" title="Computer sound only: you strum once and the computer plays a pattern until the next block. An up-strum ends it with a bass walk into the next chord.">Strum style
         <select id="strum-style"><option value="plain">Plain strum</option><option value="boom">Boom-chuck</option><option value="pick">Fingerpick</option><option value="arp">Arpeggio</option></select>
+      </label>
+      <label class="ctl" title="Jam with the band: drums and bass play along in Listen and Fixed tempo; in Follow me each good strum gets a bass note and a drum hit. Song style = whatever suits this song.">Band
+        <select id="band"><option value="auto">Song style</option><option value="folk">Folk (brushes)</option><option value="country">Country (train beat)</option><option value="rock">Rock</option><option value="off">Off</option></select>
       </label>
       <label class="ctl" title="How many strums each bar is split into (Follow me moves one block per strum)">Strums per bar
         <select id="spb"><option selected>2</option><option>4</option></select>
