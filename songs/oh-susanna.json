@@ -346,5 +346,31 @@
    "C5",
    1.5
   ]
- ]
+ ],
+ "vocalFix": {
+  "Verse 1": {
+   "slurs": [
+    14,
+    29
+   ]
+  },
+  "Verse 2": {
+   "slurs": [
+    14,
+    29
+   ]
+  },
+  "Verse 3": {
+   "slurs": [
+    14,
+    29
+   ]
+  }
+ },
+ "vocal": {
+  "file": "vocals/oh-susanna.mp3",
+  "bpm": 110,
+  "start": -2,
+  "credit": "Sung by TIGER DS (voice by tigermeat, CC BY-NC-ND 4.0, non-commercial), made with OpenUtau"
+ }
 }

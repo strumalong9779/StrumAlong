@@ -354,5 +354,32 @@
    "C5",
    1.0
   ]
- ]
+ ],
+ "vocalFix": {
+  "Verse 1": {
+   "slurs": [
+    14,
+    42
+   ]
+  },
+  "Verse 2": {
+   "slurs": [
+    42
+   ]
+  },
+  "Verse 3": {
+   "splits": [
+    0
+   ],
+   "slurs": [
+    43
+   ]
+  }
+ },
+ "vocal": {
+  "file": "vocals/yankee-doodle.mp3",
+  "bpm": 110,
+  "start": -2,
+  "credit": "Sung by TIGER DS (voice by tigermeat, CC BY-NC-ND 4.0, non-commercial), made with OpenUtau"
+ }
 }
