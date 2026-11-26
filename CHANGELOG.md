@@ -3,6 +3,11 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.7.0 — November 2026
+- **New song: Code Monkey** by Jonathan Coulton (Creative Commons BY-NC 3.0), with the Rock band. It's a song you sing yourself: words on screen, no AI singer. Four easy chords (C, F, G, Am).
+- Built-in songs can now be plain chord sheets (`.txt`): list them in `songs/index.json` as `{"sheet": "file.txt", "title", "band", "credit", ...}`.
+- A song's credit line now shows under the words.
+
 ## 1.6.0 — November 2026
 - **Jam with the band:** drums and bass now play along behind the guitar, so the chords don't sound empty. Pick the style in ⚙ Settings → **Band**: Song style (each song picks its own), Folk (brushes), Country (train beat), Rock or Off. The new **Band** slider sets drums and bass against the guitar.
 - The band plays in Listen and Fixed tempo and follows the Tempo slider; the bass follows the chords and walks into the next one. In Follow me (no clock) each good strum gets a bass note and a drum hit instead.

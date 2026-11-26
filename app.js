@@ -2,7 +2,7 @@
 // Listens to the guitar's Bluetooth/USB MIDI, works out which chord each strum was and when,
 // lights the frets, plays the sound, and shows the song, the fret to press and timing feedback.
 'use strict';
-const APP_VERSION = '1.6.0';   // bump this for every release, and add a line to CHANGELOG.md
+const APP_VERSION = '1.7.0';   // bump this for every release, and add a line to CHANGELOG.md
 
 // ---------- constants ----------
 const FRET_COLORS = { 1:'#34c759', 2:'#2f6fe0', 3:'#e5443b', 4:'#9b59e0', 5:'#62cdf5', 6:'#f5d33d', 7:'#f26fb4' };
@@ -1485,6 +1485,7 @@ function useSong(song) {
   S.song = song;
   if (S.tempo > (song.normalTempo || 80)) S.tempo = song.normalTempo || 80;
   $('song-title').textContent = `${song.title} · ${song.artist || ''}`;
+  $('song-credit').textContent = song.credit || '';
   const vp = $('verse-pick');
   vp.innerHTML = `<option value="all">All verses</option>` + song.verses.map((v, i) => `<option value="${i}">${v.name}</option>`).join('');
   if (S.verse !== 'all' && !song.verses[+S.verse]) S.verse = 'all';
@@ -1495,9 +1496,22 @@ function useSong(song) {
 async function loadSongList() {
   try {
     const list = await (await fetch('songs/index.json', { cache: 'no-store' })).json();
-    for (const f of list) {
-      if (store.get('deletedSongs', []).includes(f)) continue;   // deleted in Manage songs
-      try { const s = await (await fetch('songs/' + f, { cache: 'no-store' })).json(); if (validSong(s)) S.songs.push({ id: f, song: s }); } catch {}
+    for (const e of list) {
+      const f = typeof e === 'string' ? e : e.sheet;
+      if (!f || store.get('deletedSongs', []).includes(f)) continue;   // deleted in Manage songs
+      try {
+        let s;
+        if (typeof e === 'string') s = await (await fetch('songs/' + f, { cache: 'no-store' })).json();
+        else {
+          // a built-in song kept as a plain chord sheet (words added by a person); the index entry holds title, credit and band
+          const text = await (await fetch('songs/' + f, { cache: 'no-store' })).text();
+          s = importSongText(text, f).song;
+          delete s.imported;
+          if (e.swap) s.lines = s.lines.map(l => l.map(([c, w]) => [e.swap[c] || c, w]));   // simplify chords that aren't on a fret
+          for (const k of ['title', 'artist', 'band', 'normalTempo', 'notes', 'credit']) if (e[k] != null) s[k] = e[k];
+        }
+        if (validSong(s)) S.songs.push({ id: f, song: s });
+      } catch {}
     }
   } catch {}
   // songs you imported from chord sheets / lyrics files (kept in this browser)
