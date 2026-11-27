@@ -43,7 +43,7 @@ It gets you playing real songs from your very first strum. It shows the chords a
 
 ## Credits
 
-- Written with **Claude Opus 5.5** (Anthropic's AI), at the direction of, and tested by, the project's human author.
+- Written with **Claude Opus 5.5** (Anthropic's AI), at the direction of, and tested by, the project's author, Greg.
 - Guitar and bass sounds: FluidR3_GM soundfont by Frank Wen, CC BY 3.0, served by gleitz/midi-js-soundfonts. Drums are synthesized in the browser.
 - **Rock Out** songs play the artist's own official video through YouTube's standard player; StrumAlong stores only the chord names and their timing, worked out by ear. No recording is copied or hosted here.
 - Built-in songs are traditional, public-domain tunes, plus **Code Monkey** by Jonathan Coulton, used under the [Creative Commons Attribution-NonCommercial 3.0](https://creativecommons.org/licenses/by-nc/3.0/) licence. Chord chart and band arrangement by StrumAlong; words added and reviewed by a human maintainer, with one word changed to keep it family-friendly. Not endorsed by Jonathan Coulton.
@@ -66,6 +66,9 @@ learn and play that we hope brings more people to the guitar, and now to the key
 
 Contributions are welcome: open an **Issue** for bugs and ideas, or send a **pull request** with fixes, features or
 public-domain songs. For guitar commands, only use ones seen from the official app, and test one change at a time.
+
+Thank you, and keep playing!  
+— Greg
 
 License: MIT (see `LICENSE`).
 
