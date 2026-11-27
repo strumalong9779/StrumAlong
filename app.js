@@ -2,7 +2,7 @@
 // Listens to the guitar's Bluetooth/USB MIDI, works out which chord each strum was and when,
 // lights the frets, plays the sound, and shows the song, the fret to press and timing feedback.
 'use strict';
-const APP_VERSION = '1.9.0';   // bump this for every release, and add a line to CHANGELOG.md
+const APP_VERSION = '1.9.1';   // bump this for every release, and add a line to CHANGELOG.md
 
 // ---------- constants ----------
 const FRET_COLORS = { 1:'#34c759', 2:'#2f6fe0', 3:'#e5443b', 4:'#9b59e0', 5:'#62cdf5', 6:'#f5d33d', 7:'#f26fb4' };
@@ -898,7 +898,7 @@ function renderControls() {
   const normal = S.song?.normalTempo || 80;
   // The slider goes past the song's normal speed (up to 150%) for anyone who likes it faster.
   const tr = $('tempo'); tr.max = Math.round(normal * 1.5); tr.min = Math.max(20, Math.round(normal * 0.35)); tr.value = Math.min(S.tempo, +tr.max);
-  $('tempo-val').textContent = `${S.tempo} BPM` + (S.tempo === normal ? ' (normal)' : ` · ${Math.round(100 * S.tempo / normal)}%`);
+  $('tempo-val').textContent = `${+(+S.tempo).toFixed(1)} BPM` + (Math.abs(S.tempo - normal) < 0.05 ? ' (normal)' : ` · ${Math.round(100 * S.tempo / normal)}%`);
   const free = S.mode === 'free';
   $('tempo-ctl').classList.toggle('hidden', free);   // tempo applies to Fixed tempo and Listen
   ['start', 'listen', 'restart', 'verse-pick'].forEach(id => $(id).classList.toggle('hidden', free));

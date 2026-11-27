@@ -3,6 +3,11 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.9.1 — November 2026
+- **Listener: fix any chord.** Clicking a chord in the chart now opens a picker: the song's chords first, then every major and minor chord, so you can put in a chord the Listener missed altogether.
+- **Listener: better at telling twin chords apart.** A chord is no longer dropped as a "ghost" when its own root is clearly in the bass (e.g. C over a C bass is kept even though it shares two notes with Em).
+- The tempo readout is rounded when a Rock out song is slowed down (it could show 90.07499… BPM).
+
 ## 1.9.0 — November 2026
 - **🎧 StrumAlong Listener:** make your own Rock out with YouTube songs. It plays the official video, listens through the microphone (nothing is recorded: it keeps a 12-number pitch summary every 0.1 s and only chord names and times end up in the song), you tap the beat for 15 seconds, and it works out the chart: the song's main chords (up to 7, near-twin "ghost" chords like Am-for-C are dropped), two per bar, lined up with the record. Click a chord to fix it; ➕ Add to StrumAlong puts it straight into your song list, 💾 Save song file makes a file to share. Open it from the song menu (🎧 Make a Rock out with YouTube song…) or at `listener/`.
 - **New song: Sweet Home Alabama** (Lynyrd Skynyrd), with the official audio: D – C – G on frets 1–3.
