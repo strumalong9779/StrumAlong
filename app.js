@@ -2,7 +2,7 @@
 // Listens to the guitar's Bluetooth/USB MIDI, works out which chord each strum was and when,
 // lights the frets, plays the sound, and shows the song, the fret to press and timing feedback.
 'use strict';
-const APP_VERSION = '1.9.3';   // bump this for every release, and add a line to CHANGELOG.md
+const APP_VERSION = '1.10.0';   // bump this for every release, and add a line to CHANGELOG.md
 
 // ---------- constants ----------
 const FRET_COLORS = { 1:'#34c759', 2:'#2f6fe0', 3:'#e5443b', 4:'#9b59e0', 5:'#62cdf5', 6:'#f5d33d', 7:'#f26fb4' };
@@ -1534,6 +1534,140 @@ async function connectMIDI() {
   } catch (e) { $('guitar').textContent = 'MIDI blocked: ' + e.message; }
 }
 
+// ---------- 🎤 Mic: play any instrument ----------
+// StrumAlong listens through the microphone and hears the chord you play (guitar, keyboard, ukulele…).
+// Each new strum or key press becomes a strum, exactly as if it came from the AeroBand guitar.
+// Nothing is recorded: the sound is analysed live into 12 pitch strengths and thrown away.
+const MIC = { on: false, stream: null, src: null, an: null, buf: null, timer: null, frames: [], floor: 1,
+  lastEmit: -1e9, lastChord: null, onset: null, heard: null, level: 0 };
+const MIC_HOP_MS = 40, MIC_FROM_MS = 180, MIC_SETTLE_MS = 270, MIC_GAP_MS = 220;
+function micCandidates() {
+  // The song's own chords first (with the song's spelling, e.g. Bb not A#), then every major and minor chord.
+  const out = [], seen = new Set();
+  const add = (n, inSong) => { const c = chordPCs(n); if (!c) return;
+    const key = c.root + ':' + [...c.pcs].sort((a, z) => a - z).join(','); if (seen.has(key)) return; seen.add(key);
+    const v = new Array(12).fill(0); c.pcs.forEach((p, i) => v[p] = i === 0 ? 1 : 0.85);
+    const nv = Math.hypot(...v); out.push({ name: n, root: c.root, v: v.map(x => x / nv), inSong }); };
+  [...new Set(S.slots.map(s => s.chord).filter(Boolean))].forEach(n => add(n, true));
+  NAMES.forEach(n => { add(n, false); add(n + 'm', false); });
+  return out;
+}
+function micClassify(c, b) {
+  const nc = Math.hypot(...c) || 1, nb = b.reduce((x, y) => x + y, 0) || 1, want = S.mode === 'free' ? null : wantedChord();
+  let best = null, wantSc = -1;
+  if (MIC.candFor !== S.slots) { MIC.cands = micCandidates(); MIC.candFor = S.slots; }
+  for (const k of MIC.cands) {
+    let sc = 0; for (let i = 0; i < 12; i++) sc += k.v[i] * c[i] / nc;
+    sc += 0.1 * b[k.root] / nb + (k.inSong ? 0.04 : 0);
+    if (k.name === want) wantSc = sc;
+    if (!best || sc > best.sc) best = { name: k.name, sc };
+  }
+  if (!best || best.sc < 0.62) return null;
+  // Forgiving, like the guitar: if the chord you were asked for is (almost) as good a match, it's that chord.
+  if (want && wantSc >= best.sc - 0.05) return { name: want, sc: wantSc };
+  return best;
+}
+function micFrame() {
+  const an = MIC.an, sr = S.audio.sampleRate, N = an.fftSize, n = an.frequencyBinCount, d = MIC.buf;
+  an.getFloatFrequencyData(d);
+  const A = MIC.lin || (MIC.lin = new Float32Array(n)), prev = MIC.prevMag || (MIC.prevMag = new Float32Array(n));
+  let e = 0, flux = 0;
+  const lo = Math.ceil(70 * N / sr), hi = Math.min(n - 1, Math.floor(2100 * N / sr));
+  for (let i = 0; i < n; i++) {
+    const m = Math.pow(10, d[i] / 20); A[i] = m > 0 ? m : 0;
+    if (i < lo || i > hi) continue;
+    e += A[i] * A[i];
+    const lm = Math.log1p(1000 * A[i]); if (lm > prev[i]) flux += lm - prev[i]; prev[i] = lm;   // new sound arriving
+  }
+  // Which notes are sounding: take the strongest note (counting its overtones), remove its overtones, repeat.
+  // Removing overtones matters on a guitar: an E string's overtones would otherwise look like a B and turn C into Em.
+  const c = new Array(12).fill(0), b = new Array(12).fill(0), notes = [];
+  if (e > 1e-9) {
+    const amp = fr => { const k = Math.round(fr * N / sr); if (k + 2 >= n) return 0; let mx = 0; for (let q = k - 2; q <= k + 2; q++) if (A[q] > mx) mx = A[q]; return mx; };
+    for (let it = 0; it < 6; it++) {
+      let bestP = -1, bestS = 0;
+      for (let p = 40; p <= 84; p++) {
+        const f0 = 440 * Math.pow(2, (p - 69) / 12); let sal = 0;
+        for (let h = 1; h <= 6; h++) sal += amp(f0 * h) / Math.sqrt(h);
+        if (sal > bestS) { bestS = sal; bestP = p; }
+      }
+      if (bestP < 0 || (notes.length && bestS < 0.25 * notes[0].s)) break;
+      notes.push({ p: bestP, s: bestS });
+      const f0 = 440 * Math.pow(2, (bestP - 69) / 12);
+      for (let h = 1; h <= 8; h++) { const k = Math.round(f0 * h * N / sr); for (let q = Math.max(0, k - 3); q <= Math.min(n - 1, k + 3); q++) A[q] *= 0.15; }
+    }
+    notes.forEach(x => c[x.p % 12] += x.s);
+    if (notes.length) b[Math.min(...notes.map(x => x.p)) % 12] = 1;   // the lowest note
+  }
+  return { t: performance.now(), e, flux, c, b };
+}
+function micTick() {
+  if (!MIC.on || !MIC.an) return;
+  const fr = micFrame(), F = MIC.frames; F.push(fr); while (F.length && fr.t - F[0].t > 3000) F.shift();
+  // The room's own noise level: follows the quietest moments, creeping up only slowly (so steady playing isn't taken for noise).
+  MIC.floor = fr.e < MIC.floor ? Math.max(1e-9, fr.e) : MIC.floor * 1.0007;
+  MIC.level = Math.min(1, Math.max(0, (Math.log10(fr.e + 1e-12) + 7) / 5));
+  const loud = fr.e > Math.max(2e-6, MIC.floor * 4);
+  // A new strum or key press = a burst of new sound (spectral flux) well above the recent typical level.
+  const fl = F.filter(x => fr.t - x.t <= 1500 && x !== fr).map(x => x.flux).sort((a, z) => a - z), med = fl.length ? fl[Math.floor(fl.length / 2)] : 0;
+  if (!MIC.onset && loud && fr.t - MIC.lastEmit > MIC_GAP_MS && fr.flux > Math.max(3 * med, 8)) MIC.onset = fr.t;
+  if (MIC.onset && fr.t - MIC.onset >= MIC_SETTLE_MS) {
+    // the analyser looks back ~170 ms, so wait until its window holds only the new chord
+    const w = F.filter(x => x.t >= MIC.onset + MIC_FROM_MS && x.t <= MIC.onset + MIC_SETTLE_MS);
+    // A real strum or key press makes it louder; a flicker while a chord rings out doesn't.
+    const avgE = a => a.length ? a.reduce((s, x) => s + x.e, 0) / a.length : 0;
+    const before = avgE(F.filter(x => x.t >= MIC.onset - 240 && x.t < MIC.onset - 20)),
+          after = avgE(F.filter(x => x.t >= MIC.onset + 40 && x.t <= MIC.onset + 160));
+    const o = MIC.onset; MIC.onset = null;
+    if (after > 1.3 * before) micDecide(w, 'strum'); else MIC.lastOnsetSkipped = o;
+  }
+  const live = loud ? micAvg(F.filter(x => fr.t - x.t <= 200)) : null, lk = live && micClassify(live.c, live.b);
+  MIC.heard = lk ? lk.name : null;
+  renderMicChip();
+}
+function micAvg(w) {
+  if (!w.length) return null;
+  const c = new Array(12).fill(0), b = new Array(12).fill(0);
+  w.forEach(x => { for (let i = 0; i < 12; i++) { c[i] += x.c[i]; b[i] += x.b[i]; } });
+  return { c, b };
+}
+function micDecide(w, why) { const a = micAvg(w), k = a && micClassify(a.c, a.b); if (k) micEmit(k.name); }
+function micEmit(chord) {
+  const t = performance.now(); MIC.lastEmit = t; MIC.lastChord = chord;
+  window.STRUMS.push({ t: Math.round(t), notes: '🎤 ' + chord, n: 0 }); if (window.STRUMS.length > 60) window.STRUMS.shift();
+  onStrum({ t, chord, dir: 'down', vel: 64, notes: [], mic: true });
+}
+async function micStart() {
+  ensureAudio();
+  try {
+    MIC.stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+  } catch (e) { MIC.err = 'Microphone blocked: allow it in Chrome\'s address bar'; renderMicChip(); return; }
+  MIC.src = S.audio.createMediaStreamSource(MIC.stream);
+  MIC.an = S.audio.createAnalyser(); MIC.an.fftSize = 8192; MIC.an.smoothingTimeConstant = 0;
+  MIC.src.connect(MIC.an);   // analysed only: never connected to the speakers, never recorded
+  MIC.buf = new Float32Array(MIC.an.frequencyBinCount); MIC.frames = []; MIC.cands = null; MIC.err = null; MIC.floor = 1; MIC.prevMag = null; MIC.lin = null;
+  MIC.on = true; MIC.timer = setInterval(micTick, MIC_HOP_MS);
+  // Your instrument makes the sound now, so the computer's strum stays quiet (the band and click still play).
+  // (not saved: your Sound choice is untouched and comes back when the mic is turned off)
+  if (S.sound !== 'silent') { MIC.prevSound = S.sound; S.sound = 'silent'; renderAll(); }
+  renderMicChip();
+}
+function micStop() {
+  MIC.on = false; clearInterval(MIC.timer);
+  try { MIC.src && MIC.src.disconnect(); } catch {}
+  if (MIC.stream) MIC.stream.getTracks().forEach(t => t.stop());
+  MIC.stream = MIC.src = MIC.an = null; MIC.heard = null;
+  if (MIC.prevSound) { if (S.sound === 'silent') { S.sound = MIC.prevSound; if (S.sound !== 'guitar') loadSamples(); renderAll(); } MIC.prevSound = null; }
+  renderMicChip();
+}
+function renderMicChip() {
+  const b = $('mic-btn'), c = $('mic-chip'); if (!b || !c) return;
+  b.classList.toggle('on', MIC.on); b.textContent = MIC.on ? '🎤 Any instrument: on' : '🎤 Any instrument';
+  if (MIC.err) { c.textContent = MIC.err; c.classList.remove('ok'); return; }
+  c.classList.toggle('ok', MIC.on);
+  c.innerHTML = MIC.on ? `<span class="mic-lvl"><i style="width:${Math.round(MIC.level * 100)}%"></i></span> ${MIC.heard ? 'hearing <b>' + MIC.heard + '</b>' : 'listening…'}` : 'experimental';
+}
+
 // ---------- keyboard demo strums (no guitar needed) ----------
 function voicing(chord) {
   const c = chordPCs(chord); if (!c) return [];
@@ -1643,6 +1777,8 @@ $('start').onclick = () => S.playing ? stop() : start();
 $('restart').onclick = () => { resetRun(); };
 $('listen').onclick = () => listen();
 $('lights-btn').onclick = () => connectLights();
+$('mic-btn').onclick = () => MIC.on ? micStop() : micStart();
+renderMicChip();
 document.querySelectorAll('#mode-seg button').forEach(b => b.onclick = () => {
   S.mode = b.dataset.mode; store.set('mode', S.mode); resetRun();
 });

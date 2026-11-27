@@ -1,19 +1,22 @@
 # StrumAlong
 
-**Version 1.9.3** (November 2026) · see `CHANGELOG.md`
+**Version 1.10.0** (November 2026) · see `CHANGELOG.md`
 
 *Unofficial project, free and as-is: use at your own risk. See the [Disclaimer](#disclaimer) at the bottom.*
 
-**If you're learning guitar, just starting out, or just want to make some music, StrumAlong is here.** It's a free, open-source companion app for the **AeroBand smart guitar** (also called the Aero Guitar) that gets you playing real songs from your very first strum. It lights the fret to press for each chord, shows the chords and words big on your computer screen, and **waits for you**: the song only moves on when you strum, so you learn at your own pace. Already play? It works for you too. Runs in Google Chrome on a Mac or Windows computer.
+> **🎤 New in 1.10: StrumAlong is now for everyone.** No AeroBand? No problem. Press **🎤 Any instrument** and play a real guitar, keyboard, ukulele or piano: StrumAlong listens through your computer's microphone, hears the chords you play and moves the song along. *Experimental: tell us how it works for you.*
+
+**If you're learning guitar, just starting out, or just want to make some music, StrumAlong is here.** It's a free, open-source companion app for the **AeroBand smart guitar** (also called the Aero Guitar) that gets you playing real songs from your very first strum. It lights the fret to press for each chord, shows the chords and words big on your computer screen, and **waits for you**: the song only moves on when you strum, so you learn at your own pace. Already play? It works for you too. **And now it works with any instrument** that plays chords: a regular guitar, a keyboard, a ukulele (🎤 Any instrument, experimental). Runs in Google Chrome on a Mac or Windows computer.
 
 ![StrumAlong playing I've Been Working on the Railroad: the chord to play now, the scrolling chord chart and the words, with the new Band slider and Band styles highlighted](docs/screenshot.png)
 
 - No install, no drivers, no AeroBand phone app needed.
 - Works with the guitar over Bluetooth, straight from the browser.
+- **🎤 Any instrument (new in 1.10, experimental):** play a regular guitar, keyboard, ukulele or piano near your computer. StrumAlong hears each chord through the microphone (nothing is recorded), so Follow me, Fixed tempo and Free play work without an AeroBand. Click the button again to switch it off. Best with headphones for the band and click, so it hears only you. Play chords, not single notes.
 - Bring your own songs: drop a chord sheet (text or ChordPro) on the window.
 - **Jam with the band (new in 1.6):** drums and bass play along behind your strums (Folk, Country or Rock; each song picks a style), with a **Band** slider to mix them in.
 - **🎸 Rock Out:** play along with the real record. Pick **Summer of '69** or **Sweet Home Alabama** and the artist's official video plays inside StrumAlong while the frets light up in time with it. The Tempo slider slows the video down (0.75× or 0.5×) for practice. Works with ▶ Listen and Fixed tempo; needs an internet connection.
-- **🎧 Make your own Rock Out songs (new in 1.9):** the StrumAlong Listener hears a YouTube song through your computer's microphone and writes down its chords. Tap the beat, check the chart, click to fix any chord, and add it to your song list. Nothing is ever recorded: a song keeps only chord names and their timing. Song menu → 🎧 Make a Rock out with YouTube song…
+- **🎧 Make your own Rock Out songs (new in 1.9):** the StrumAlong Listener hears a YouTube song through your computer's microphone and writes down its chords. Tap the beat, check the chart, click to fix any chord, and add it to your song list. Nothing is ever recorded: a song keeps only chord names and their timing. Song menu → 🎧 Make a Rock Out song…
 - **New in 1.7: Code Monkey** by Jonathan Coulton, rocking with the band. Sing it yourself: the words are on screen (credit and licence below).
 - **Hear it sung:** the traditional songs (Kumbaya, Clementine, Oh! Susanna, Yankee Doodle and I've Been Working on the Railroad) come with a sung vocal (an AI singer) that sings along with the chords in Listen and Fixed tempo, so you can hear how the words fit the strums. A **Voice** slider sets the singer against the guitar.
 

@@ -14,7 +14,7 @@ StrumAlong is a free, open-source play-along app that runs in your web browser. 
 ## What StrumAlong itself keeps
 
 - **Your settings and songs** (volume, tempo, the song you picked, songs you added or made with the Listener) are saved in your own browser (local storage). They never leave your computer, and clearing your browser data deletes them.
-- **The microphone (Listener only):** the Listener analyses the sound live to work out chords. **No audio is ever recorded, saved or sent anywhere.** It keeps only a pitch summary in memory, and the finished song holds only chord names and times. The microphone is used only while you press Listen and stops when you press Stop or the song ends.
+- **The microphone (the Listener and 🎤 Any instrument):** the sound is analysed live to work out chords. **No audio is ever recorded, saved or sent anywhere.** The Listener keeps only a pitch summary in memory, and a finished song holds only chord names and times; Any instrument keeps only the last few seconds of pitch strengths, to judge the chord you just played. The microphone is used only while the Listener is listening or Any instrument is switched on, and stops when you stop it.
 - **The guitar:** StrumAlong talks to your AeroBand guitar over Bluetooth on your own computer. Nothing about it is sent anywhere.
 
 ## What other services see

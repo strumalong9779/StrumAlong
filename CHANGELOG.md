@@ -3,6 +3,11 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.10.0 — November 2026
+- **🎤 Any instrument (experimental): StrumAlong is now for everyone.** A new button next to 💡 Connect. Turn it on, play a regular guitar, keyboard, ukulele or piano near the computer, and StrumAlong hears the chord you play through the microphone. Each new strum or key press counts like a strum on the AeroBand, so Follow me, Fixed tempo and Free play all work. It finds the notes sounding (removing each note's overtones, so a guitar's open C isn't mistaken for Em) and judges the chord about a quarter-second after you play. A live level bar shows what it hears.
+- While it's on, the computer's own strum is silent (your instrument makes the sound); your Sound choice comes back when you turn it off, and is never overwritten. Nothing else changes: with it off, StrumAlong works exactly as before.
+- Nothing is recorded: the sound is analysed live and thrown away (see PRIVACY.md).
+
 ## 1.9.3 — November 2026
 - **Privacy & Terms:** new `PRIVACY.md` (what StrumAlong keeps, what YouTube and other services see), linked from the README.
 - Rock Out songs and the Listener now say that they use YouTube's player, with links to the YouTube Terms of Service and the privacy page, as YouTube's developer policies ask.
