@@ -1,6 +1,6 @@
 # StrumAlong
 
-**Version 1.8.0** (November 2026) · see `CHANGELOG.md`
+**Version 1.9.0** (November 2026) · see `CHANGELOG.md`
 
 *Unofficial project, free and as-is: use at your own risk. See the [Disclaimer](#disclaimer) at the bottom.*
 
@@ -12,11 +12,12 @@
 - Works with the guitar over Bluetooth, straight from the browser.
 - Bring your own songs: drop a chord sheet (text or ChordPro) on the window.
 - **Jam with the band (new in 1.6):** drums and bass play along behind your strums (Folk, Country or Rock; each song picks a style), with a **Band** slider to mix them in.
-- **🎸 Rock out with YouTube (new in 1.8):** play along with the real record. Pick **Summer of '69** and the official Bryan Adams video plays inside StrumAlong while the frets light up in time with it. The Tempo slider slows the video down (0.75× or 0.5×) for practice. Works with ▶ Listen and Fixed tempo; needs an internet connection.
+- **🎸 Rock out with YouTube:** play along with the real record. Pick **Summer of '69** or **Sweet Home Alabama** and the artist's official video plays inside StrumAlong while the frets light up in time with it. The Tempo slider slows the video down (0.75× or 0.5×) for practice. Works with ▶ Listen and Fixed tempo; needs an internet connection.
+- **🎧 Make your own Rock out songs (new in 1.9):** the StrumAlong Listener hears a YouTube song through your computer's microphone and writes down its chords. Tap the beat, check the chart, click to fix any chord, and add it to your song list. Nothing is ever recorded: a song keeps only chord names and their timing. Song menu → 🎧 Make a Rock out with YouTube song…
 - **New in 1.7: Code Monkey** by Jonathan Coulton, rocking with the band. Sing it yourself: the words are on screen (credit and licence below).
 - **Hear it sung:** the traditional songs (Kumbaya, Clementine, Oh! Susanna, Yankee Doodle and I've Been Working on the Railroad) come with a sung vocal (an AI singer) that sings along with the chords in Listen and Fixed tempo, so you can hear how the words fit the strums. A **Voice** slider sets the singer against the guitar.
 
-**Guides:** `docs/StrumAlong-Quick-Start.pdf` (first use, 2 pages), `docs/StrumAlong-User-Guide.pdf` (how to play) and `docs/StrumAlong-Technical-Guide.pdf` (how it works, how to change it).
+**Guides:** `docs/StrumAlong-Quick-Start.pdf` (first use, 2 pages), `docs/StrumAlong-User-Guide.pdf` (how to play) `docs/StrumAlong-Rock-Out-Guide.pdf` (play along with YouTube and make your own songs, 2 pages) and `docs/StrumAlong-Technical-Guide.pdf` (how it works, how to change it).
 
 ## Quick start
 

@@ -2,7 +2,7 @@
 // Listens to the guitar's Bluetooth/USB MIDI, works out which chord each strum was and when,
 // lights the frets, plays the sound, and shows the song, the fret to press and timing feedback.
 'use strict';
-const APP_VERSION = '1.8.0';   // bump this for every release, and add a line to CHANGELOG.md
+const APP_VERSION = '1.9.0';   // bump this for every release, and add a line to CHANGELOG.md
 
 // ---------- constants ----------
 const FRET_COLORS = { 1:'#34c759', 2:'#2f6fe0', 3:'#e5443b', 4:'#9b59e0', 5:'#62cdf5', 6:'#f5d33d', 7:'#f26fb4' };
@@ -1306,6 +1306,7 @@ function chordShape(name) {
 //  'song': only the song's chords, ordered by where they sit in the key (home chord on fret 1, then up the scale)
 //  'key' : all seven chords of the key, like AeroBand's own layout; song chords outside the key replace the same-root one
 function easyLayout(song, mode = S.fretLayout) {
+  if (song.youtube) mode = 'song';   // a Rock out song plays the record's own chords, so they all go on the frets
   const keyName = song.key || song.lines?.[0]?.[0]?.[0] || 'C', kp = chordPCs(keyName) || { root: 0, pcs: [0, 4, 7] };
   const minor = /m$|min$/.test(keyName) && !/dim$/.test(keyName), tonic = kp.root;
   const steps = minor ? [[0, 'm'], [2, 'dim'], [3, ''], [5, 'm'], [7, 'm'], [8, ''], [10, '']] : [[0, ''], [2, 'm'], [4, 'm'], [5, ''], [7, ''], [9, 'm'], [11, 'dim']];
@@ -1598,7 +1599,7 @@ function fillSongPicker() {
   const cur = store.get('song', null);
   $('song-pick').innerHTML =
     S.songs.map(x => `<option value="${esc(x.id)}">${esc(songName(x))}</option>`).join('') +
-    '<option disabled>──────────</option><option value="__add">📂 Add song…</option><option value="__manage">✏️ Manage songs…</option>';
+    '<option disabled>──────────</option><option value="__add">📂 Add song…</option><option value="__listen">🎧 Make a Rock out with YouTube song…</option><option value="__manage">✏️ Manage songs…</option>';
   if (cur && S.songs.some(x => x.id === cur)) $('song-pick').value = cur;
 }
 // Manage songs: rename or delete any song.
@@ -1681,6 +1682,7 @@ $('verse-pick').onchange = e => { S.verse = e.target.value; store.set('verse', S
 $('song-pick').onchange = e => {
   const v = e.target.value;
   if (v === '__add') $('add-song-file').click();
+  else if (v === '__listen') window.open('listener/', '_blank');
   else if (v === '__manage') openManage();
   else { const x = S.songs.find(s => s.id === v); if (x) { store.set('song', x.id); useSong(x.song); } return; }
   e.target.value = store.get('song', S.songs[0]?.id);   // the menu goes back to showing the current song
@@ -1716,7 +1718,7 @@ async function loadSongFiles(files) {
       if (/\.json$/i.test(f.name)) {
         s = JSON.parse(text);
         if (!validSong(s)) { showMsg('Not a song file', 1500); continue; }
-        id = 'dropped:' + f.name;
+        id = 'import:' + s.title; saveImport(id, s);   // keep it for next time (e.g. a Rock out song someone shared)
       } else {
         // chord sheet / ChordPro / words-only text: convert it, and keep it for next time
         const r = importSongText(text, f.name);

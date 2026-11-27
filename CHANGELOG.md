@@ -3,6 +3,13 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.9.0 — November 2026
+- **🎧 StrumAlong Listener:** make your own Rock out with YouTube songs. It plays the official video, listens through the microphone (nothing is recorded: it keeps a 12-number pitch summary every 0.1 s and only chord names and times end up in the song), you tap the beat for 15 seconds, and it works out the chart: the song's main chords (up to 7, near-twin "ghost" chords like Am-for-C are dropped), two per bar, lined up with the record. Click a chord to fix it; ➕ Add to StrumAlong puts it straight into your song list, 💾 Save song file makes a file to share. Open it from the song menu (🎧 Make a Rock out with YouTube song…) or at `listener/`.
+- **New song: Sweet Home Alabama** (Lynyrd Skynyrd), with the official audio: D – C – G on frets 1–3.
+- Rock out songs always put the song's own chords on the frets (whatever the Fret layout setting), since the record decides the chords.
+- Song files added with 📂 Add song… (.json, e.g. a shared Rock out song) now stay in your song list.
+- New guide: `docs/StrumAlong-Rock-Out-Guide.pdf`.
+
 ## 1.8.0 — November 2026
 - **🎸 Rock out with YouTube:** songs can now play along with an official YouTube video. The video is the music; the song clock follows the video's own time, so the lit frets and chord chart stay in sync, and the Tempo slider sets the video's speed (YouTube's 0.75× / 0.5× steps).
 - **New song: Summer of '69** (Bryan Adams), with the official video. Seven chords: D, A, Bm, G and the bridge's F, B♭, C.
