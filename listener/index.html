@@ -49,6 +49,12 @@
   #chart .c.edited { color:var(--warn); }
   .chips { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
   .chip { background:#232836; border:1px solid #333a4a; border-radius:14px; padding:3px 10px; font-size:13px; }
+  #pick { position:absolute; z-index:50; background:#151924; border:1px solid #4a5570; border-radius:10px; padding:8px; box-shadow:0 10px 30px rgba(0,0,0,.6); width:300px; }
+  #pick .h { font-size:11px; color:#8a93a6; margin:2px 2px 4px; text-transform:uppercase; letter-spacing:.5px; }
+  #pick .g { display:grid; grid-template-columns:repeat(6,1fr); gap:4px; margin-bottom:6px; }
+  #pick button { padding:5px 0; font-weight:700; font-size:13px; background:#232836; border:1px solid #333a4a; border-radius:6px; color:#e8ecf4; cursor:pointer; }
+  #pick button.in { background:#2b3a5c; border-color:#5d7cc4; }
+  #pick button.cur { outline:2px solid var(--warn); }
   label.f { display:block; font-size:12px; color:var(--dim); margin-top:8px; }
   label.f input { width:100%; margin-top:3px; }
   .kbd { display:inline-block; border:1px solid #4a5570; border-radius:4px; padding:0 5px; font-size:12px; }
@@ -92,7 +98,7 @@
     </div></div>
 
     <div id="chart">
-      <div class="note">Click a chord to change it. Click a time to hear that spot. Chords on the guitar: <span id="vocab" class="chips" style="display:inline-flex"></span></div>
+      <div class="note">Click a chord to change it (any chord). Click a time to hear that spot. Chords on the guitar: <span id="vocab" class="chips" style="display:inline-flex"></span></div>
       <div id="grid" style="margin-top:8px"></div>
       <div class="step" id="s4"><div class="n">4</div><div class="t">
         <b>Name it and add it.</b>
@@ -304,7 +310,8 @@ function cells(F, set, beat, phase) {
     for (let j = fi; j < F.length && F[j].t < t + half + 0.12; j++) { F[j].c.forEach((x, k) => c[k] += x); F[j].b.forEach((x, k) => b[k] += x); e += F[j].e; n++; }
     if (!n || e / n <= thr) { out.push({ t, ch: 'N', s: 0, m: 0 }); continue; }
     const s = scoreRow(c, b, set); const ord = s.map((x, k) => [x, k]).sort((a, b2) => b2[0] - a[0]);
-    out.push({ t, ch: set[ord[0][1]].name, s: ord[0][0], m: ord[0][0] - (ord[1] ? ord[1][0] : 0) });
+    const bt = b.reduce((x, y) => x + y, 0) || 1;
+    out.push({ t, ch: set[ord[0][1]].name, s: ord[0][0], m: ord[0][0] - (ord[1] ? ord[1][0] : 0), b: b.map(x => x / bt) });
   }
   return out;
 }
@@ -330,11 +337,14 @@ $('make').onclick = () => {
       const base = cells(F, vocab.map(tmpl), g.beat, ph); let weakest = null;
       for (const x of vocab) {
         const rest = vocab.filter(y => y !== x), alt = cells(F, rest.map(tmpl), g.beat, ph);
-        let n = 0, loss = 0; base.forEach((b, i) => { if (b.ch === x) { n++; loss += b.s - alt[i].s; } });
+        let n = 0, loss = 0, own = 0, other = 0; const r = tmpl(x).root;
+        base.forEach((b, i) => { if (b.ch === x) { n++; loss += b.s - alt[i].s; if (b.b) { own += b.b[r]; other += b.b[tmpl(alt[i].ch === 'N' ? x : alt[i].ch).root]; } } });
+        // a real chord has its own root in the bass (C over a C bass); a ghost borrows its twin's (Am over C)
+        if (n && own / n >= 0.15 && own >= 1.25 * other) continue;
         const avg = n ? loss / n : 0;
         if (!weakest || avg < weakest.avg) weakest = { x, avg };
       }
-      if (weakest.avg >= 0.06) break;
+      if (!weakest || weakest.avg >= 0.06) break;
       vocab = vocab.filter(y => y !== weakest.x);
     }
     let cs = cells(F, vocab.map(tmpl), g.beat, ph);
@@ -365,11 +375,32 @@ function drawChart() {
 }
 $('grid').onclick = e => {
   const c = e.target.closest('.c'), tm = e.target.closest('.tm');
-  if (c) {   // cycle through the song's chords
-    const i = +c.dataset.i, v = song.vocab, k = v.indexOf(song.cells[i]);
-    song.cells[i] = v[(k + 1) % v.length]; song.edited[i] = true; c.textContent = song.cells[i]; c.classList.add('edited');
-  } else if (tm) { player.seekTo(+tm.dataset.t, true); player.playVideo(); setTimeout(() => player.pauseVideo(), 10000); }
+  if (c) openPick(c);
+  else if (tm) { player.seekTo(+tm.dataset.t, true); player.playVideo(); setTimeout(() => player.pauseVideo(), 10000); }
 };
+// chord picker: the song's chords first, then every major and minor chord (for one the Listener missed)
+function openPick(c) {
+  closePick();
+  const i = +c.dataset.i, cur = song.cells[i], p = document.createElement('div'); p.id = 'pick';
+  const btn = n => `<button data-n="${n}" class="${song.vocab.includes(n) ? 'in' : ''}${n === cur ? ' cur' : ''}">${n}</button>`;
+  p.innerHTML = `<div class="h">In this song</div><div class="g">${song.vocab.map(btn).join('')}</div>` +
+    `<div class="h">Any chord</div><div class="g">${NAMES.map(btn).join('')}${NAMES.map(n => btn(n + 'm')).join('')}</div>`;
+  const r = c.getBoundingClientRect();
+  p.style.left = Math.max(8, Math.min(window.scrollX + r.left - 110, window.scrollX + document.documentElement.clientWidth - 316)) + 'px';
+  p.style.top = (window.scrollY + r.bottom + 6) + 'px';
+  p.onclick = e => {
+    const b = e.target.closest('button'); if (!b) return; const n = b.dataset.n;
+    song.cells[i] = n; song.edited[i] = true; c.textContent = n; c.classList.add('edited');
+    if (!song.vocab.includes(n)) { song.vocab.push(n); $('vocab').innerHTML = song.vocab.map(x => `<span class="chip">${x}</span>`).join(''); }
+    const used = new Set(song.cells); song.vocab = song.vocab.filter(x => used.has(x)); $('vocab').innerHTML = song.vocab.map(x => `<span class="chip">${x}</span>`).join('');
+    if (used.size > 7) status($('makeinfo'), `This song now has ${used.size} chords; the guitar has 7 chord frets, so only the 7 used most get a fret.`, 'warn');
+    closePick();
+  };
+  document.body.appendChild(p);
+  setTimeout(() => document.addEventListener('click', outside, true), 0);
+}
+function outside(e) { if (!e.target.closest('#pick')) closePick(); }
+function closePick() { const p = $('pick'); if (p) p.remove(); document.removeEventListener('click', outside, true); }
 function finalSong() {
   const s = { title: $('title').value.trim() || 'My Rock out song', artist: $('artist').value.trim(),
     normalTempo: song.normalTempo, beatsPerBar: 4, cellBeats: 2, youtube: song.youtube, band: 'off', verses: song.verses,
