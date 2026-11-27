@@ -94,7 +94,7 @@ Rock Out lets you play along with famous songs, and it was built to respect the 
 3. **Chords are free for everyone.** A Rock Out song file holds only chord names and when they change, for example "C, then G two beats later". No melody, tab, sheet music, recording or snippet of audio. Chord progressions are the shared building blocks of music: in the Ed Sheeran "Thinking Out Loud" case (*Structured Asset Sales v. Sheeran*, 2024), the US Court of Appeals for the Second Circuit held that chord progressions and harmonic rhythm are not protected by copyright, and the Supreme Court declined to review it.
 4. **The Listener listens; it doesn't record.** When you make your own Rock Out song, the Listener hears the song through your microphone, keeps only a summary of which notes it hears, and saves only chord names and their timing. No sound is ever recorded, saved or uploaded.
 5. **Names are used only to say which song it is.** Song titles and artist names identify the song. StrumAlong is not affiliated with or endorsed by any artist, label, publisher or by YouTube.
-6. **Own a song and want it changed or removed?** Open an Issue on GitHub, or send a notice through [GitHub's own copyright process](https://docs.github.com/en/site-policy/content-removal-policies/dmca-takedown-policy), and we'll take it down promptly, no argument needed. We would much rather send people to your music than argue about it.
+6. **Questions about any of this?** Open an Issue on GitHub.
 
 ## Visits
 
