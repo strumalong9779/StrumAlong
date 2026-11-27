@@ -2,7 +2,7 @@
 // Listens to the guitar's Bluetooth/USB MIDI, works out which chord each strum was and when,
 // lights the frets, plays the sound, and shows the song, the fret to press and timing feedback.
 'use strict';
-const APP_VERSION = '1.10.1';   // bump this for every release, and add a line to CHANGELOG.md
+const APP_VERSION = '1.11.0';   // bump this for every release, and add a line to CHANGELOG.md
 
 // ---------- constants ----------
 const FRET_COLORS = { 1:'#34c759', 2:'#2f6fe0', 3:'#e5443b', 4:'#9b59e0', 5:'#62cdf5', 6:'#f5d33d', 7:'#f26fb4' };
@@ -1196,11 +1196,34 @@ function ytRate() {
 }
 function ytStart() {
   if (!ytSong() || !YTV.ready) return false;
-  const start = S.song.youtube.start || 0, bar = (S.song.beatsPerBar || 4) * 60 / (S.song.normalTempo || 100);
+  const start = ytTimeOfBeat(0), bar = (S.song.beatsPerBar || 4) * 60 / (S.song.normalTempo || 100);
   ytRate();
   YTV.player.seekTo(Math.max(0, start - bar), true);   // a bar of the recording plays as the count-in
   YTV.player.playVideo();
   return true;
+}
+// Records played without a click drift in tempo. Such a song can list the video time of every beat
+// (youtube.beats); the song clock then follows that beat map. Songs without it use one steady tempo from "start".
+function ytBeatAt(vt) {
+  const y = S.song.youtube, m = y.beats;
+  if (!m || m.length < 2) return (vt - (y.start || 0)) * (S.song.normalTempo || 100) / 60;
+  let lo = 0, hi = m.length - 1;
+  if (vt <= m[0]) return (vt - m[0]) / (m[1] - m[0]);
+  if (vt >= m[hi]) return hi + (vt - m[hi]) / (m[hi] - m[hi - 1]);
+  while (hi - lo > 1) { const mid = (lo + hi) >> 1; if (m[mid] <= vt) lo = mid; else hi = mid; }
+  return lo + (vt - m[lo]) / (m[hi] - m[lo]);
+}
+function ytTimeOfBeat(b) {
+  const y = S.song.youtube, m = y.beats;
+  if (!m || m.length < 2) return (y.start || 0) + b * 60 / (S.song.normalTempo || 100);
+  const i = Math.max(0, Math.min(m.length - 2, Math.floor(b)));
+  return m[i] + (b - i) * (m[i + 1] - m[i]);
+}
+function ytLocalTempo(vt) {
+  const m = S.song.youtube.beats;
+  if (!m || m.length < 2) return S.song.normalTempo || 100;
+  const i = Math.floor(ytBeatAt(vt)), a = Math.max(0, i - 4), b = Math.min(m.length - 1, Math.max(a + 1, i + 4));
+  return 60 * (b - a) / (m[b] - m[a]);   // averaged over about two bars, so the readout stays steady
 }
 function ytStop() { if (YTV.player && YTV.ready) YTV.player.pauseVideo(); }
 // Keep the song clock on the video's clock (corrects drift, buffering and seeking).
@@ -1208,10 +1231,10 @@ function ytSync() {
   if (!ytSong() || !YTV.ready || !timed()) return;
   const st = YTV.player.getPlayerState?.();
   if (st !== YT.PlayerState.PLAYING) { S.t0 += 16; S.countInUntil = Math.max(S.countInUntil || 0, performance.now()); return; }   // hold while paused/buffering
-  const rate = YTV.player.getPlaybackRate() || 1;
-  const tempo = (S.song.normalTempo || 100) * rate;
-  if (Math.abs(S.tempo - tempo) > 0.01) { S.tempo = tempo; renderControls(); }
-  const beat = (YTV.player.getCurrentTime() - (S.song.youtube.start || 0)) * (S.song.normalTempo || 100) / 60;
+  const rate = YTV.player.getPlaybackRate() || 1, vt = YTV.player.getCurrentTime();
+  const tempo = ytLocalTempo(vt) * rate;
+  if (Math.abs(S.tempo - tempo) > (S.song.youtube.beats ? 0.3 : 0.01)) { S.tempo = tempo; renderControls(); }
+  const beat = ytBeatAt(vt);
   const want = performance.now() - beat * beatMs();
   if (Math.abs(want - S.t0) > 35) S.t0 = want;
 }

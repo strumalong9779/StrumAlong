@@ -3,6 +3,12 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.11.0 — November 2026
+- **Three more 🎸 Rock Out songs:** **Let It Be** (The Beatles), **Against the Wind** (Bob Seger & The Silver Bullet Band) and **You Belong With Me** (Taylor Swift). Each plays the artist's own YouTube upload; Against the Wind uses Bob Seger's official lyric video, so the words are on screen in the artist's own video. As always, StrumAlong ships only chord names and their timing.
+- **Rock Out follows records that speed up and slow down.** A Rock Out song can now carry a beat-by-beat timing map, so the chords stay with bands that played without a click track (Let It Be drifts from about 72 to 68 BPM). Add-on only: songs without a map work exactly as before.
+- **Code Monkey removed** from the built-in songs.
+- README: new section, **Rock Out: rights and permissions, in plain English**.
+
 ## 1.10.1 — November 2026
 - Words only: StrumAlong now introduces itself as a free play-along app for **anyone learning guitar or keyboard**, and for players who want to practise along with the music they love: made for the AeroBand guitar (all of its AeroBand features stay), now for any guitar, keyboard or ukulele. README, page title, and all four guides updated, plus why it exists: a project to help more people make music, for the good of all.
 
