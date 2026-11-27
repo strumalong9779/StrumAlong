@@ -3,6 +3,9 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.10.1 — November 2026
+- Words only: StrumAlong now introduces itself as a free play-along app for **anyone learning guitar or keyboard**, and for players who want to practise along with the music they love: made for the AeroBand guitar (all of its AeroBand features stay), now for any guitar, keyboard or ukulele. README, page title, and all four guides updated, plus why it exists: a project to help more people make music, for the good of all.
+
 ## 1.10.0 — November 2026
 - **🎤 Any instrument (experimental): StrumAlong is now for everyone.** A new button next to 💡 Connect. Turn it on, play a regular guitar, keyboard, ukulele or piano near the computer, and StrumAlong hears the chord you play through the microphone. Each new strum or key press counts like a strum on the AeroBand, so Follow me, Fixed tempo and Free play all work. It finds the notes sounding (removing each note's overtones, so a guitar's open C isn't mistaken for Em) and judges the chord about a quarter-second after you play. A live level bar shows what it hears.
 - While it's on, the computer's own strum is silent (your instrument makes the sound); your Sound choice comes back when you turn it off, and is never overwritten. Nothing else changes: with it off, StrumAlong works exactly as before.
