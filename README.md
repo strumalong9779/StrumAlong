@@ -6,7 +6,9 @@
 
 > **🎤 New in 1.10: StrumAlong is now for everyone.** No AeroBand? No problem. Press **🎤 Any instrument** and play a real guitar, keyboard, ukulele or piano: StrumAlong listens through your computer's microphone, hears the chords you play and moves the song along. *Experimental: tell us how it works for you.*
 
-**If you're learning guitar, just starting out, or just want to make some music, StrumAlong is here.** It's a free, open-source companion app for the **AeroBand smart guitar** (also called the Aero Guitar) that gets you playing real songs from your very first strum. It lights the fret to press for each chord, shows the chords and words big on your computer screen, and **waits for you**: the song only moves on when you strum, so you learn at your own pace. Already play? It works for you too. **And now it works with any instrument** that plays chords: a regular guitar, a keyboard, a ukulele (🎤 Any instrument, experimental). Runs in Google Chrome on a Mac or Windows computer.
+**StrumAlong is a free play-along app for anyone learning guitar or keyboard, and for players who want to practise along with the music they love.** It started life as a companion for the **AeroBand smart guitar** (also called the Aero Guitar), and everything it does for the AeroBand is still here. Now it works with any guitar, keyboard or ukulele too (🎤 Any instrument, experimental), and with **🎸 Rock Out** you can play along with the real record on YouTube.
+
+It gets you playing real songs from your very first strum. It shows the chords and words big on your computer screen, lights the AeroBand's fret for each chord, and **waits for you**: in Follow me, the song only moves on when you play the chord, so you learn at your own pace. Already play? It works for you too. Runs free in Google Chrome on a Mac or Windows computer.
 
 ![StrumAlong playing I've Been Working on the Railroad: the chord to play now, the scrolling chord chart and the words, with the new Band slider and Band styles highlighted](docs/screenshot.png)
 
@@ -57,8 +59,10 @@ observed from the guitar's own Bluetooth traffic, for interoperability; use at y
 
 ## Why it exists, and contributing
 
-We think the AeroBand guitar is a great product. StrumAlong is meant to enhance it, not compete with it: a big-screen way to
-learn and play that we hope brings more people to the guitar.
+StrumAlong is a project to help more people make music, for the good of all. Our only hope is that you find it useful.
+
+It began with the AeroBand guitar, which we think is a great product. StrumAlong is meant to enhance it, not compete with it: a big-screen way to
+learn and play that we hope brings more people to the guitar, and now to the keyboard and every other instrument too.
 
 Contributions are welcome: open an **Issue** for bugs and ideas, or send a **pull request** with fixes, features or
 public-domain songs. For guitar commands, only use ones seen from the official app, and test one change at a time.
