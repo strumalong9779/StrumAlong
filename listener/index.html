@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>StrumAlong Listener – make a Rock out with YouTube song</title>
+<title>StrumAlong Listener – make a Rock Out song</title>
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <style>
   :root { color-scheme: dark; --dim:#8a93a6; --line:#2a2f3c; --card:#1b1e27; --bg:#12141a; --ok:#34c759; --warn:#ffa51f; --bad:#ff6b62; --blue:#2f6fe0; }
@@ -63,7 +63,7 @@
 <body>
 <header>
   <h1>🎧 StrumAlong Listener</h1>
-  <span class="sub">Turns a YouTube song into a 🎸 Rock out with YouTube song. It listens through the microphone and writes down the chords. No sound is ever recorded or saved.</span>
+  <span class="sub">Turns a song on YouTube into a 🎸 Rock Out song you can play along with. It listens through the microphone and writes down the chords. No sound is ever recorded or saved.</span>
   <a href="../">← back to StrumAlong</a>
 </header>
 <main>
@@ -402,7 +402,7 @@ function openPick(c) {
 function outside(e) { if (!e.target.closest('#pick')) closePick(); }
 function closePick() { const p = $('pick'); if (p) p.remove(); document.removeEventListener('click', outside, true); }
 function finalSong() {
-  const s = { title: $('title').value.trim() || 'My Rock out song', artist: $('artist').value.trim(),
+  const s = { title: $('title').value.trim() || 'My Rock Out song', artist: $('artist').value.trim(),
     normalTempo: song.normalTempo, beatsPerBar: 4, cellBeats: 2, youtube: song.youtube, band: 'off', verses: song.verses,
     lines: [], credit: 'Plays along with the official video on YouTube. Chords worked out by ear with the StrumAlong Listener; no recording is copied.' };
   for (let i = 0; i < song.cells.length; i += 8) s.lines.push(song.cells.slice(i, i + 8).map(c => [c, '']));
