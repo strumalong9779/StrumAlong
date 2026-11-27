@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>StrumAlong Listener – make a Rock out with YouTube song</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root { color-scheme: dark; --dim:#8a93a6; --line:#2a2f3c; --card:#1b1e27; --bg:#12141a; --ok:#34c759; --warn:#ffa51f; --bad:#ff6b62; --blue:#2f6fe0; }
+  * { box-sizing: border-box; }
+  body { margin:0; font:15px/1.45 -apple-system, "Segoe UI", Inter, system-ui, sans-serif; background:var(--bg); color:#e8eaf0; }
+  header { display:flex; align-items:baseline; gap:14px; padding:14px 22px; border-bottom:1px solid #262a35; flex-wrap:wrap; }
+  header h1 { font-size:20px; margin:0; }
+  header .sub { color:var(--dim); font-size:13px; }
+  header a { color:#8fb4ff; font-size:13px; margin-left:auto; }
+  main { display:grid; grid-template-columns: minmax(440px, 1fr) 380px; gap:18px; padding:18px 22px; }
+  .panel { background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 16px; }
+  .row { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  input[type=text] { background:var(--bg); color:#e8eaf0; border:1px solid #333a4a; border-radius:8px; padding:9px 10px; font-size:14px; }
+  #url { flex:1; min-width:240px; }
+  button { background:#2b3242; color:#e8eaf0; border:1px solid #3a4357; border-radius:8px; padding:9px 14px; font-size:14px; cursor:pointer; }
+  button.go { background:var(--blue); border-color:var(--blue); }
+  button.stop { background:#c4413a; border-color:#c4413a; }
+  button.ok { background:#2e8b4e; border-color:#2e8b4e; }
+  button:disabled { opacity:.45; cursor:default; }
+  #player-wrap { margin-top:12px; aspect-ratio:16/9; background:#000; border-radius:10px; overflow:hidden; }
+  #player-wrap > div, #player-wrap iframe { width:100%; height:100%; }
+  h2 { font-size:13px; letter-spacing:.08em; text-transform:uppercase; color:var(--dim); margin:0 0 6px; }
+  .step { display:flex; gap:10px; align-items:flex-start; margin:12px 0 0; }
+  .step .n { flex:none; width:24px; height:24px; border-radius:12px; background:#2b3242; display:grid; place-items:center; font-weight:700; font-size:13px; }
+  .step.done .n { background:var(--ok); color:#0b2; color:#062; }
+  .step .t { flex:1; }
+  .note { color:var(--dim); font-size:13px; margin:4px 0 0; }
+  .ok { color:var(--ok); } .warn { color:var(--warn); } .err { color:var(--bad); }
+  #now { font-size:64px; font-weight:800; letter-spacing:-1px; line-height:1; margin:6px 0 2px; }
+  #meter { height:8px; background:#262a35; border-radius:4px; overflow:hidden; margin:10px 0 4px; }
+  #meter > i { display:block; height:100%; width:0; background:var(--ok); transition:width .1s; }
+  #chroma { display:grid; grid-template-columns: repeat(12, 1fr); gap:3px; align-items:end; height:60px; margin-top:10px; }
+  #chroma b { background:var(--blue); border-radius:3px 3px 0 0; min-height:2px; }
+  #chroma-l { display:grid; grid-template-columns: repeat(12, 1fr); gap:3px; font-size:10px; color:var(--dim); text-align:center; }
+  #tapbtn { width:100%; padding:16px; font-size:18px; font-weight:700; margin-top:8px; }
+  #tapbtn.hit { background:#3d4a66; }
+  #chart { margin-top:14px; display:none; }
+  #chart .ln { display:grid; grid-template-columns: 54px repeat(8, 1fr); gap:4px; margin-bottom:4px; }
+  #chart .tm { color:var(--dim); font:12px ui-monospace, Menlo, monospace; align-self:center; cursor:pointer; }
+  #chart .tm:hover { color:#fff; }
+  #chart .c { background:#232836; border:1px solid #333a4a; border-radius:6px; text-align:center; padding:6px 0; font-weight:700; cursor:pointer; user-select:none; }
+  #chart .c.bar { border-left:3px solid #4a5570; }
+  #chart .c.now { outline:2px solid var(--warn); }
+  #chart .c.edited { color:var(--warn); }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; margin-top:6px; }
+  .chip { background:#232836; border:1px solid #333a4a; border-radius:14px; padding:3px 10px; font-size:13px; }
+  label.f { display:block; font-size:12px; color:var(--dim); margin-top:8px; }
+  label.f input { width:100%; margin-top:3px; }
+  .kbd { display:inline-block; border:1px solid #4a5570; border-radius:4px; padding:0 5px; font-size:12px; }
+</style>
+</head>
+<body>
+<header>
+  <h1>🎧 StrumAlong Listener</h1>
+  <span class="sub">Turns a YouTube song into a 🎸 Rock out with YouTube song. It listens through the microphone and writes down the chords. No sound is ever recorded or saved.</span>
+  <a href="../">← back to StrumAlong</a>
+</header>
+<main>
+  <section class="panel">
+    <div class="row">
+      <input id="url" type="text" placeholder="Paste a YouTube link (use the artist's official video or audio)">
+      <button id="load">Load video</button>
+    </div>
+    <div id="player-wrap"><div id="player"></div></div>
+
+    <div class="step" id="s1"><div class="n">1</div><div class="t">
+      <b>Listen.</b> Speakers up, headphones off, a quiet room. Press <b>Listen &amp; play</b> and let the whole song play once.
+      <div class="row" style="margin-top:6px">
+        <button id="start" class="go" disabled>🎧 Listen &amp; play</button>
+        <button id="stop" class="stop" disabled>■ Stop</button>
+        <span id="status" class="note"></span>
+      </div>
+    </div></div>
+
+    <div class="step" id="s2"><div class="n">2</div><div class="t">
+      <b>Tap the beat.</b> Press <b>Tap along</b> and tap the big button (or the <span class="kbd">Space</span> bar) on every beat for about 15 seconds, like tapping your foot. This sets the tempo and the bar lines.
+      <div class="row" style="margin-top:6px">
+        <button id="tapgo" disabled>👆 Tap along</button>
+        <span id="tapinfo" class="note"></span>
+      </div>
+      <button id="tapbtn" class="hidden" style="display:none">TAP</button>
+    </div></div>
+
+    <div class="step" id="s3"><div class="n">3</div><div class="t">
+      <b>Make the chart.</b>
+      <div class="row" style="margin-top:6px"><button id="make" class="go" disabled>🎼 Work out the chords</button><span id="makeinfo" class="note"></span></div>
+    </div></div>
+
+    <div id="chart">
+      <div class="note">Click a chord to change it. Click a time to hear that spot. Chords on the guitar: <span id="vocab" class="chips" style="display:inline-flex"></span></div>
+      <div id="grid" style="margin-top:8px"></div>
+      <div class="step" id="s4"><div class="n">4</div><div class="t">
+        <b>Name it and add it.</b>
+        <label class="f">Song title <input id="title" type="text"></label>
+        <label class="f">Artist <input id="artist" type="text"></label>
+        <div class="row" style="margin-top:10px">
+          <button id="add" class="ok">➕ Add to StrumAlong</button>
+          <button id="save">💾 Save song file</button>
+          <span id="addinfo" class="note"></span>
+        </div>
+      </div></div>
+    </div>
+  </section>
+
+  <section class="panel">
+    <h2>Hearing now</h2>
+    <div id="now">–</div>
+    <div id="conf" class="note">waiting</div>
+    <div id="meter"><i></i></div>
+    <div id="chroma"></div>
+    <div id="chroma-l"></div>
+    <h2 style="margin-top:16px">Tips</h2>
+    <ul class="note" style="padding-left:18px;margin:0">
+      <li>Pick songs with clear guitar or piano chords. Busy, heavily produced mixes are harder.</li>
+      <li>Use the artist's official video or "(Audio)" upload. If a video says it can't play here, try another official upload.</li>
+      <li>The chart only keeps chord names and times. Nothing you hear is saved.</li>
+      <li>Rock songs often use "power chords" with no major or minor: if A and Am both show up, pick the one that sounds right and change the others.</li>
+    </ul>
+  </section>
+</main>
+<script>
+'use strict';
+const NAMES = ['C','C#','D','Eb','E','F','F#','G','Ab','A','Bb','B'];
+const $ = id => document.getElementById(id);
+const L = { version: 2, videoId: null, title: '', frames: [], changes: [], taps: [], done: false };
+window.LISTENER = L;
+let player = null, playerReady = false, ac = null, an = null, stream = null, timer = null, buf = null, prevMag = null;
+let smooth = new Float32Array(12), mode = null, song = null;
+
+function tmpl(name) {
+  const m = name.endsWith('m'), r = NAMES.indexOf(m ? name.slice(0, -1) : name);
+  const v = new Array(12).fill(0); v[r] = 1; v[(r + (m ? 3 : 4)) % 12] = 0.6; v[(r + 7) % 12] = 0.85;
+  const n = Math.hypot(...v); return { name, root: r, v: v.map(x => x / n) };
+}
+const ALL = []; for (const n of NAMES) { ALL.push(tmpl(n)); ALL.push(tmpl(n + 'm')); }
+$('chroma').innerHTML = NAMES.map(() => '<b></b>').join('');
+$('chroma-l').innerHTML = NAMES.map(n => `<span>${n}</span>`).join('');
+function status(el, msg, cls) { el.textContent = msg; el.className = 'note ' + (cls || ''); }
+function fmt(t) { t = Math.max(0, t); const m = Math.floor(t / 60), s = (t % 60).toFixed(1).padStart(4, '0'); return m + ':' + s; }
+
+// ---------- YouTube (official embed) ----------
+function videoIdFrom(s) {
+  s = s.trim(); const m = s.match(/(?:v=|youtu\.be\/|embed\/|shorts\/)([A-Za-z0-9_-]{11})/);
+  return m ? m[1] : (/^[A-Za-z0-9_-]{11}$/.test(s) ? s : null);
+}
+window.onYouTubeIframeAPIReady = () => { playerReady = true; };
+(() => { const s = document.createElement('script'); s.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(s); })();
+$('load').onclick = () => {
+  const id = videoIdFrom($('url').value);
+  if (!id) return status($('status'), 'That doesn\'t look like a YouTube link.', 'err');
+  if (!playerReady) return status($('status'), 'The YouTube player is still loading; try again in a second.', 'warn');
+  if (L.videoId !== id) { L.frames = []; L.taps = []; L.done = false; }
+  L.videoId = id; song = null; $('chart').style.display = 'none';
+  if (player) { player.cueVideoById(id); setTimeout(onVideo, 800); return; }
+  player = new YT.Player('player', {
+    videoId: id, playerVars: { rel: 0, playsinline: 1, modestbranding: 1, origin: location.origin },
+    events: {
+      onReady: onVideo,
+      onError: e => status($('status'), e.data === 101 || e.data === 150 ? 'This video only plays on YouTube itself. Try another official upload.' : 'YouTube error ' + e.data, 'err'),
+      onStateChange: e => { if (e.data === YT.PlayerState.ENDED && mode === 'listen') finishListen('Song finished.'); }
+    }
+  });
+};
+function onVideo() {
+  L.title = player.getVideoData?.().title || '';
+  const parts = L.title.replace(/\s*[\(\[].*?[\)\]]\s*/g, ' ').split(/\s+[-–—]\s+/);
+  $('artist').value = parts.length > 1 ? parts[0].trim() : '';
+  $('title').value = (parts.length > 1 ? parts.slice(1).join(' - ') : parts[0]).trim();
+  status($('status'), L.done ? 'Video ready. An earlier listen of this song was found: you can go straight to step 2 or 3.' : 'Video ready.', 'ok');
+  $('start').disabled = false; $('tapgo').disabled = false; updateMake();
+  if (L.done) document.getElementById('s1').classList.add('done');
+}
+const vt = () => player && player.getCurrentTime ? player.getCurrentTime() : 0;
+
+// ---------- step 1: listen (microphone → 12-number pitch summary every 0.1 s; never audio) ----------
+async function startMic() {
+  stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } });
+  ac = new AudioContext(); an = ac.createAnalyser(); an.fftSize = 16384; an.smoothingTimeConstant = 0;
+  ac.createMediaStreamSource(stream).connect(an);   // analysed only: never recorded, never played back
+  buf = new Float32Array(an.frequencyBinCount); prevMag = null;
+}
+function analyse() {
+  an.getFloatFrequencyData(buf);
+  const binHz = ac.sampleRate / an.fftSize, chroma = new Float32Array(12), bass = new Float32Array(12), mag = new Float32Array(buf.length);
+  let energy = 0, flux = 0;
+  for (let i = 1; i < buf.length; i++) {
+    const f = i * binHz; if (f < 50 || f > 4200) continue;
+    const a = Math.pow(10, buf[i] / 20); mag[i] = a; energy += a * a;
+    if (prevMag) { const d = a - prevMag[i]; if (d > 0) flux += d; }
+    if (f > 2100) continue;
+    const midi = 69 + 12 * Math.log2(f / 440), near = Math.round(midi), off = Math.abs(midi - near);
+    if (off > 0.35) continue;
+    const w = a * (1 - off / 0.35), pc = ((near % 12) + 12) % 12;
+    chroma[pc] += w * (f < 1000 ? 1 : 0.6); if (f < 260) bass[pc] += w;
+  }
+  prevMag = mag;
+  return { chroma, bass, energy: Math.sqrt(energy), flux };
+}
+function tick() {
+  const t = vt(), { chroma, bass, energy, flux } = analyse();
+  const tot = chroma.reduce((a, b) => a + b, 0), cn = tot > 0 ? chroma.map(x => x / tot) : chroma;
+  const bt = bass.reduce((a, b) => a + b, 0), bn = bt > 0 ? bass.map(x => x / bt) : bass;
+  L.frames.push({ t: +t.toFixed(3), c: Array.from(cn, x => +x.toFixed(3)), b: Array.from(bn, x => +x.toFixed(3)), e: +energy.toFixed(4), f: +flux.toFixed(4) });
+  for (let i = 0; i < 12; i++) smooth[i] = smooth[i] * 0.8 + cn[i] * 0.2;
+  const loud = energy > 0.002;
+  let best = '–', bs = 0;
+  if (loud) { const n = Math.hypot(...smooth) || 1; for (const k of ALL) { const s = k.v.reduce((a, x, i) => a + x * smooth[i], 0) / n; if (s > bs) { bs = s; best = k.name; } } }
+  $('now').textContent = loud ? best : '–';
+  status($('conf'), !loud ? 'too quiet: turn the speakers up' : bs > 0.8 ? 'hearing it clearly' : 'not sure', !loud ? 'warn' : bs > 0.8 ? 'ok' : '');
+  $('meter').firstChild.style.width = Math.min(100, energy * 4000) + '%';
+  const mx = Math.max(...smooth) || 1; [...$('chroma').children].forEach((b, i) => b.style.height = (smooth[i] / mx * 100) + '%');
+}
+$('start').onclick = async () => {
+  try { await startMic(); } catch (e) { return status($('status'), 'Microphone blocked: allow it in the address bar and try again.', 'err'); }
+  L.frames = []; L.done = false; mode = 'listen';
+  player.seekTo(0, true); player.playVideo();
+  timer = setInterval(tick, 100);
+  $('start').disabled = true; $('stop').disabled = false; $('tapgo').disabled = true;
+  status($('status'), 'Listening… let the whole song play. (You can tap the beat now too: Space bar.)', 'ok');
+};
+$('stop').onclick = () => { if (mode === 'listen') finishListen('Stopped.'); else if (mode === 'tap') finishTap(); };
+function finishListen(msg) {
+  clearInterval(timer); timer = null; mode = null; player.pauseVideo();
+  if (stream) stream.getTracks().forEach(t => t.stop()); if (ac) ac.close(); stream = ac = null;
+  L.done = true; try { localStorage.setItem('listener.last', JSON.stringify(L)); } catch {}
+  $('start').disabled = false; $('stop').disabled = true; $('tapgo').disabled = false;
+  document.getElementById('s1').classList.add('done');
+  status($('status'), msg + ` Heard ${fmt(L.frames.length ? L.frames[L.frames.length - 1].t : 0)} of music.`, 'ok');
+  updateMake();
+}
+
+// ---------- step 2: tap the beat (the person sets the tempo and bar lines) ----------
+function tap() {
+  if (mode !== 'tap' && mode !== 'listen') return;
+  L.taps.push(+vt().toFixed(3));
+  const b = $('tapbtn'); b.classList.add('hit'); setTimeout(() => b.classList.remove('hit'), 90);
+  const g = tapGrid(); $('tapinfo').textContent = L.taps.length + ' taps' + (g ? ` · about ${g.bpm.toFixed(0)} BPM` : '');
+}
+document.addEventListener('keydown', e => { if (e.code === 'Space' && (mode === 'tap' || mode === 'listen')) { e.preventDefault(); tap(); } });
+$('tapbtn').onclick = tap;
+$('tapgo').onclick = () => {
+  mode = 'tap'; L.taps = [];
+  const from = Math.max(0, (L.frames.find(f => f.e > 0.004)?.t || 0) + 5);
+  player.seekTo(from, true); player.playVideo();
+  $('tapbtn').style.display = 'block'; $('stop').disabled = false; $('start').disabled = true;
+  $('tapinfo').textContent = 'Tap on every beat…';
+  setTimeout(() => { if (mode === 'tap') finishTap(); }, 20000);
+};
+function finishTap() {
+  mode = null; player.pauseVideo(); $('tapbtn').style.display = 'none'; $('stop').disabled = true; $('start').disabled = false;
+  const g = tapGrid();
+  if (g) { document.getElementById('s2').classList.add('done'); $('tapinfo').textContent = `${L.taps.length} taps · ${g.bpm.toFixed(1)} BPM`; }
+  else $('tapinfo').textContent = 'Not enough steady taps: try again (8 or more).';
+  try { localStorage.setItem('listener.last', JSON.stringify(L)); } catch {}
+  updateMake();
+}
+// least-squares beat grid from the taps (ignores a stray double-tap or a missed beat)
+function tapGrid() {
+  const t = L.taps.slice().sort((a, b) => a - b); if (t.length < 8) return null;
+  const d = []; for (let i = 1; i < t.length; i++) d.push(t[i] - t[i - 1]);
+  const med = d.slice().sort((a, b) => a - b)[Math.floor(d.length / 2)]; if (!(med > 0.25 && med < 1.5)) return null;
+  const pts = [[0, t[0]]]; let k = 0;
+  for (let i = 1; i < t.length; i++) { const n = Math.round((t[i] - t[i - 1]) / med); if (n < 1) continue; k += n; pts.push([k, t[i]]); }
+  const n = pts.length, mx = pts.reduce((a, p) => a + p[0], 0) / n, my = pts.reduce((a, p) => a + p[1], 0) / n;
+  let sxy = 0, sxx = 0; pts.forEach(([x, y]) => { sxy += (x - mx) * (y - my); sxx += (x - mx) ** 2; });
+  const beat = sxy / sxx; if (!(beat > 0.25 && beat < 1.5)) return null;
+  return { beat, bpm: 60 / beat, phase: my - beat * mx };   // phase = time of a beat
+}
+function updateMake() { const ok = L.done && L.frames.length > 200, g = tapGrid(); $('make').disabled = !(ok && g); $('makeinfo').textContent = !ok ? '' : (g ? '' : 'Tap the beat first (step 2).'); }
+
+// ---------- step 3: work out the chart ----------
+function scoreRow(c, b, set) {
+  const n = Math.hypot(...c) || 1, bs = b.reduce((a, x) => a + x, 0) || 1;
+  return set.map(k => k.v.reduce((a, x, i) => a + x * c[i], 0) / n + 0.35 * b[k.root] / bs);
+}
+function chooseVocab(F) {
+  // which chords does the song use? best chord per frame, smoothed, then count time per chord
+  const E = F.map(f => f.e).sort((a, b) => a - b), thr = E[Math.floor(E.length * 0.2)] * 0.5;
+  const dur = {};
+  for (let i = 0; i < F.length; i++) {
+    if (F[i].e <= thr) continue;
+    const c = new Array(12).fill(0), b = new Array(12).fill(0);
+    for (let j = Math.max(0, i - 4); j <= Math.min(F.length - 1, i + 4); j++) { F[j].c.forEach((x, k) => c[k] += x); F[j].b.forEach((x, k) => b[k] += x); }
+    const s = scoreRow(c, b, ALL); let bi = 0; s.forEach((x, k) => { if (x > s[bi]) bi = k; });
+    dur[ALL[bi].name] = (dur[ALL[bi].name] || 0) + 1;
+  }
+  // power chords: when both X and Xm show up, keep the one heard more
+  for (const r of NAMES) { const M = dur[r] || 0, m = dur[r + 'm'] || 0; if (M && m) { if (M >= m) { dur[r] = M + m; delete dur[r + 'm']; } else { dur[r + 'm'] = M + m; delete dur[r]; } } }
+  const total = Object.values(dur).reduce((a, x) => a + x, 0);
+  return Object.entries(dur).filter(([, x]) => x / total > 0.025).sort((a, b) => b[1] - a[1]).slice(0, 7).map(([n]) => n);
+}
+function cells(F, set, beat, phase) {
+  const half = beat * 2, end = F[F.length - 1].t, out = [];
+  const E = F.map(f => f.e).sort((a, b) => a - b), thr = E[Math.floor(E.length * 0.2)] * 0.5;
+  let fi = 0;
+  for (let t = phase; t < end - half / 2; t += half) {
+    const c = new Array(12).fill(0), b = new Array(12).fill(0); let e = 0, n = 0;
+    while (fi < F.length && F[fi].t < t + 0.12) fi++;
+    for (let j = fi; j < F.length && F[j].t < t + half + 0.12; j++) { F[j].c.forEach((x, k) => c[k] += x); F[j].b.forEach((x, k) => b[k] += x); e += F[j].e; n++; }
+    if (!n || e / n <= thr) { out.push({ t, ch: 'N', s: 0, m: 0 }); continue; }
+    const s = scoreRow(c, b, set); const ord = s.map((x, k) => [x, k]).sort((a, b2) => b2[0] - a[0]);
+    out.push({ t, ch: set[ord[0][1]].name, s: ord[0][0], m: ord[0][0] - (ord[1] ? ord[1][0] : 0) });
+  }
+  return out;
+}
+$('make').onclick = () => {
+  const F = L.frames; if (!F.length) return;
+  status($('makeinfo'), 'Working…');
+  setTimeout(() => {
+    const names = chooseVocab(F), set = names.map(tmpl);
+    const g = tapGrid(); if (!g) { status($('makeinfo'), 'Tap the beat first (step 2).', 'warn'); return; }
+    const half = g.beat * 2;
+    // which beat starts a half-bar? try both, keep the one where chords sit best
+    let best = null;
+    for (const off of [0, 1]) {
+      let ph = g.phase + off * g.beat; while (ph - half > 0) ph -= half;
+      const cs = cells(F, set, g.beat, ph), tot = cs.reduce((a, x) => a + x.s, 0);
+      if (!best || tot > best.tot) best = { tot, cs, ph };
+    }
+    // drop "ghost" chords: a chord stays only if taking it away makes the chart fit clearly worse
+    // (Am / Em often show up as near-twins of C / G)
+    let vocab = names.slice(), ph = best.ph;
+    for (;;) {
+      if (vocab.length <= 2) break;
+      const base = cells(F, vocab.map(tmpl), g.beat, ph); let weakest = null;
+      for (const x of vocab) {
+        const rest = vocab.filter(y => y !== x), alt = cells(F, rest.map(tmpl), g.beat, ph);
+        let n = 0, loss = 0; base.forEach((b, i) => { if (b.ch === x) { n++; loss += b.s - alt[i].s; } });
+        const avg = n ? loss / n : 0;
+        if (!weakest || avg < weakest.avg) weakest = { x, avg };
+      }
+      if (weakest.avg >= 0.06) break;
+      vocab = vocab.filter(y => y !== weakest.x);
+    }
+    let cs = cells(F, vocab.map(tmpl), g.beat, ph);
+    // remove one-cell flickers that sit between two cells of the same chord when the call was close
+    for (let i = 1; i < cs.length - 1; i++) if (cs[i].ch !== cs[i - 1].ch && cs[i - 1].ch === cs[i + 1].ch && cs[i].m < 0.04) cs[i].ch = cs[i - 1].ch;
+    // carry a chord through short silences inside the song; trim silence at both ends
+    let first = cs.findIndex(x => x.ch !== 'N'); let last = cs.length - 1; while (last > 0 && cs[last].ch === 'N') last--;
+    cs = cs.slice(first, last + 1); for (let i = 1; i < cs.length; i++) if (cs[i].ch === 'N') cs[i].ch = cs[i - 1].ch;
+    // line up the chart in four-bar lines, starting on a bar where possible
+    song = { title: '', artist: '', normalTempo: +(60 / g.beat).toFixed(1), beatsPerBar: 4, cellBeats: 2,
+             youtube: { id: L.videoId, start: +cs[0].t.toFixed(3) }, band: 'off', verses: [{ name: 'Whole song' }],
+             cells: cs.map(x => x.ch), times: cs.map(x => x.t), edited: [], vocab };
+    drawChart();
+    $('chart').style.display = 'block';
+    document.getElementById('s3').classList.add('done');
+    status($('makeinfo'), `${vocab.length} chords · ${song.normalTempo} BPM. Check it by ear, fix any chord, then add it.`, 'ok');
+  }, 30);
+};
+function drawChart() {
+  $('vocab').innerHTML = song.vocab.map(n => `<span class="chip">${n}</span>`).join('');
+  let h = '';
+  for (let i = 0; i < song.cells.length; i += 8) {
+    h += `<div class="ln"><div class="tm" data-t="${song.times[i]}">${fmt(song.times[i])}</div>`;
+    for (let j = i; j < i + 8; j++) h += j < song.cells.length ? `<div class="c${j % 2 === 0 ? ' bar' : ''}${song.edited[j] ? ' edited' : ''}" data-i="${j}">${song.cells[j]}</div>` : '<div></div>';
+    h += '</div>';
+  }
+  $('grid').innerHTML = h;
+}
+$('grid').onclick = e => {
+  const c = e.target.closest('.c'), tm = e.target.closest('.tm');
+  if (c) {   // cycle through the song's chords
+    const i = +c.dataset.i, v = song.vocab, k = v.indexOf(song.cells[i]);
+    song.cells[i] = v[(k + 1) % v.length]; song.edited[i] = true; c.textContent = song.cells[i]; c.classList.add('edited');
+  } else if (tm) { player.seekTo(+tm.dataset.t, true); player.playVideo(); setTimeout(() => player.pauseVideo(), 10000); }
+};
+function finalSong() {
+  const s = { title: $('title').value.trim() || 'My Rock out song', artist: $('artist').value.trim(),
+    normalTempo: song.normalTempo, beatsPerBar: 4, cellBeats: 2, youtube: song.youtube, band: 'off', verses: song.verses,
+    lines: [], credit: 'Plays along with the official video on YouTube. Chords worked out by ear with the StrumAlong Listener; no recording is copied.' };
+  for (let i = 0; i < song.cells.length; i += 8) s.lines.push(song.cells.slice(i, i + 8).map(c => [c, '']));
+  return s;
+}
+// ---------- step 4: add to StrumAlong (same site, so it can go straight into your song list) ----------
+$('add').onclick = () => {
+  const s = finalSong(), id = 'import:' + s.title;
+  try {
+    const all = JSON.parse(localStorage.getItem('ab.importedSongs') || '[]').filter(x => x.id !== id);
+    all.push({ id, song: s }); localStorage.setItem('ab.importedSongs', JSON.stringify(all));
+    localStorage.setItem('ab.song', JSON.stringify(id));
+    $('addinfo').innerHTML = `Added. <a href="../" style="color:#8fb4ff">Open StrumAlong</a> and pick “${s.title}”.`;
+    document.getElementById('s4').classList.add('done');
+  } catch (e) { status($('addinfo'), 'Could not add it: ' + e.message, 'err'); }
+};
+$('save').onclick = () => {
+  const s = finalSong(), a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([JSON.stringify(s, null, 1)], { type: 'application/json' }));
+  a.download = (s.title || 'song').replace(/[^\w\- ]+/g, '').trim().replace(/\s+/g, '-').toLowerCase() + '.json'; a.click();
+  status($('addinfo'), 'Saved. Load it in StrumAlong with 📂 Add song…', 'ok');
+};
+
+// pick up an earlier listen (e.g. after a reload)
+try { const old = JSON.parse(localStorage.getItem('listener.last') || 'null'); if (old && old.frames && old.frames.length) { Object.assign(L, old); L.taps = old.taps || []; if (L.videoId) $('url').value = 'https://www.youtube.com/watch?v=' + L.videoId; } } catch {}
+</script>
+</body>
+</html>
