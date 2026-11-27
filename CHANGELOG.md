@@ -3,20 +3,23 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.9.2 — November 2026
+- The play-along-with-the-record feature is now simply called **🎸 Rock Out**. It works the same way: it plays the artist's official video on YouTube, through YouTube's standard player, and StrumAlong adds the chords. Song menu: 🎧 Make a Rock Out song….
+
 ## 1.9.1 — November 2026
 - **Listener: fix any chord.** Clicking a chord in the chart now opens a picker: the song's chords first, then every major and minor chord, so you can put in a chord the Listener missed altogether.
 - **Listener: better at telling twin chords apart.** A chord is no longer dropped as a "ghost" when its own root is clearly in the bass (e.g. C over a C bass is kept even though it shares two notes with Em).
-- The tempo readout is rounded when a Rock out song is slowed down (it could show 90.07499… BPM).
+- The tempo readout is rounded when a Rock Out song is slowed down (it could show 90.07499… BPM).
 
 ## 1.9.0 — November 2026
-- **🎧 StrumAlong Listener:** make your own Rock out with YouTube songs. It plays the official video, listens through the microphone (nothing is recorded: it keeps a 12-number pitch summary every 0.1 s and only chord names and times end up in the song), you tap the beat for 15 seconds, and it works out the chart: the song's main chords (up to 7, near-twin "ghost" chords like Am-for-C are dropped), two per bar, lined up with the record. Click a chord to fix it; ➕ Add to StrumAlong puts it straight into your song list, 💾 Save song file makes a file to share. Open it from the song menu (🎧 Make a Rock out with YouTube song…) or at `listener/`.
+- **🎧 StrumAlong Listener:** make your own Rock Out songs. It plays the official video, listens through the microphone (nothing is recorded: it keeps a 12-number pitch summary every 0.1 s and only chord names and times end up in the song), you tap the beat for 15 seconds, and it works out the chart: the song's main chords (up to 7, near-twin "ghost" chords like Am-for-C are dropped), two per bar, lined up with the record. Click a chord to fix it; ➕ Add to StrumAlong puts it straight into your song list, 💾 Save song file makes a file to share. Open it from the song menu (🎧 Make a Rock Out song…) or at `listener/`.
 - **New song: Sweet Home Alabama** (Lynyrd Skynyrd), with the official audio: D – C – G on frets 1–3.
-- Rock out songs always put the song's own chords on the frets (whatever the Fret layout setting), since the record decides the chords.
-- Song files added with 📂 Add song… (.json, e.g. a shared Rock out song) now stay in your song list.
+- Rock Out songs always put the song's own chords on the frets (whatever the Fret layout setting), since the record decides the chords.
+- Song files added with 📂 Add song… (.json, e.g. a shared Rock Out song) now stay in your song list.
 - New guide: `docs/StrumAlong-Rock-Out-Guide.pdf`.
 
 ## 1.8.0 — November 2026
-- **🎸 Rock out with YouTube:** songs can now play along with an official YouTube video. The video is the music; the song clock follows the video's own time, so the lit frets and chord chart stay in sync, and the Tempo slider sets the video's speed (YouTube's 0.75× / 0.5× steps).
+- **🎸 Rock Out:** songs can now play along with an official YouTube video. The video is the music; the song clock follows the video's own time, so the lit frets and chord chart stay in sync, and the Tempo slider sets the video's speed (YouTube's 0.75× / 0.5× steps).
 - **New song: Summer of '69** (Bryan Adams), with the official video. Seven chords: D, A, Bm, G and the bridge's F, B♭, C.
 - Song files can carry `"youtube": {"id", "start"}`; `start` is where beat 0 of the chord chart falls in the video.
 - With a video song the computer doesn't strum or play the band over the record. Follow me isn't available yet for video songs (use ▶ Listen or Fixed tempo).
