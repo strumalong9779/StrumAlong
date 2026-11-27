@@ -1,6 +1,6 @@
 # StrumAlong
 
-**Version 1.7.0** (November 2026) · see `CHANGELOG.md`
+**Version 1.8.0** (November 2026) · see `CHANGELOG.md`
 
 *Unofficial project, free and as-is: use at your own risk. See the [Disclaimer](#disclaimer) at the bottom.*
 
@@ -12,6 +12,7 @@
 - Works with the guitar over Bluetooth, straight from the browser.
 - Bring your own songs: drop a chord sheet (text or ChordPro) on the window.
 - **Jam with the band (new in 1.6):** drums and bass play along behind your strums (Folk, Country or Rock; each song picks a style), with a **Band** slider to mix them in.
+- **🎸 Rock out with YouTube (new in 1.8):** play along with the real record. Pick **Summer of '69** and the official Bryan Adams video plays inside StrumAlong while the frets light up in time with it. The Tempo slider slows the video down (0.75× or 0.5×) for practice. Works with ▶ Listen and Fixed tempo; needs an internet connection.
 - **New in 1.7: Code Monkey** by Jonathan Coulton, rocking with the band. Sing it yourself: the words are on screen (credit and licence below).
 - **Hear it sung:** the traditional songs (Kumbaya, Clementine, Oh! Susanna, Yankee Doodle and I've Been Working on the Railroad) come with a sung vocal (an AI singer) that sings along with the chords in Listen and Fixed tempo, so you can hear how the words fit the strums. A **Voice** slider sets the singer against the guitar.
 
@@ -38,6 +39,7 @@
 
 - Written with **Claude Opus 5.5** (Anthropic's AI), at the direction of, and tested by, the project's human author.
 - Guitar and bass sounds: FluidR3_GM soundfont by Frank Wen, CC BY 3.0, served by gleitz/midi-js-soundfonts. Drums are synthesized in the browser.
+- **Rock out with YouTube** songs play the artist's own official video through YouTube's standard player; StrumAlong stores only the chord names and their timing, worked out by ear. No recording is copied or hosted here.
 - Built-in songs are traditional, public-domain tunes, plus **Code Monkey** by Jonathan Coulton, used under the [Creative Commons Attribution-NonCommercial 3.0](https://creativecommons.org/licenses/by-nc/3.0/) licence. Chord chart and band arrangement by StrumAlong; words added and reviewed by a human maintainer, with one word changed to keep it family-friendly. Not endorsed by Jonathan Coulton.
 - The song vocals are sung by **TIGER DS**, a free AI singing voice by tigermeat (licence CC BY-NC-ND 4.0 with Commons Clause: free for non-commercial use), rendered with **OpenUtau** (free, MIT licence). The vocal recordings (`songs/vocals/*.mp3`) are not covered by StrumAlong's MIT licence: share them only non-commercially, with this credit.
 

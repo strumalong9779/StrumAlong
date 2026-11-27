@@ -2,7 +2,7 @@
 // Listens to the guitar's Bluetooth/USB MIDI, works out which chord each strum was and when,
 // lights the frets, plays the sound, and shows the song, the fret to press and timing feedback.
 'use strict';
-const APP_VERSION = '1.7.0';   // bump this for every release, and add a line to CHANGELOG.md
+const APP_VERSION = '1.8.0';   // bump this for every release, and add a line to CHANGELOG.md
 
 // ---------- constants ----------
 const FRET_COLORS = { 1:'#34c759', 2:'#2f6fe0', 3:'#e5443b', 4:'#9b59e0', 5:'#62cdf5', 6:'#f5d33d', 7:'#f26fb4' };
@@ -548,7 +548,7 @@ function start() {
   ensureAudio();
   S.playing = true;
   $('start').textContent = 'Stop';
-  if (S.mode === 'fixed') anchorClock();
+  if (S.mode === 'fixed') { anchorClock(); ytStart(); }
   renderAll();
 }
 // Start the song clock after a one-bar count-in.
@@ -567,20 +567,22 @@ async function listen() {
   if (!S.song) return;
   if (S.demo && S.playing) { stop(); return; }
   resetRun();
-  await loadSamples();
-  if (S.samplesState !== 'ready') { showMsg('No guitar sound', 1500); return; }
+  if (!ytSong()) {
+    await loadSamples();
+    if (S.samplesState !== 'ready') { showMsg('No guitar sound', 1500); return; }
+  }
   S.demo = true; S.playing = true; S.demoTick = 0;
-  anchorClock();
+  anchorClock(); ytStart();
   $('listen').textContent = '■ Stop listening';
   renderAll();
 }
 function stop() {
-  S.playing = false; S.demo = false;
+  S.playing = false; S.demo = false; ytStop();
   $('start').textContent = 'Start'; $('listen').textContent = '▶ Listen'; hideMsg(); renderAll();
 }
 function finish() {
   const wasDemo = S.demo;
-  S.playing = false; S.demo = false;
+  S.playing = false; S.demo = false; ytStop();
   $('start').textContent = 'Start'; $('listen').textContent = '▶ Listen';
   showMsg(wasDemo ? 'Your turn' : 'Done', 2500);
   renderAll();
@@ -588,6 +590,7 @@ function finish() {
 // True while a song clock is running (Fixed tempo, or Listen).
 function timed() { return S.playing && (S.mode === 'fixed' || S.demo); }
 function setTempo(v) {
+  if (ytSong()) { S.tempo = v; const r = ytRate(); if (r) S.tempo = (S.song.normalTempo || 100) * r; renderControls(); return; }
   const keep = timed() ? fixedPos() : null;
   S.tempo = v; store.set('tempo', v);
   if (keep != null) {
@@ -623,7 +626,7 @@ function playMelodyNote(midi, at, dur) {
   S.voices.mel = { src, g };
 }
 // The Mac strums the song: in Listen, and in Fixed tempo when Backing is ticked.
-const backingOn = () => S.demo || (S.backing && S.mode === 'fixed');
+const backingOn = () => !ytSong() && (S.demo || (S.backing && S.mode === 'fixed'));
 // ---------- strum patterns ----------
 // One character per eighth note across one bar: D = down-strum, U = up-strum, B = bass note (root),
 // A = alternate bass note, . = rest. A song can set its own "pattern" (and "swing": true for a shuffle).
@@ -1151,7 +1154,70 @@ function renderFree() {
 }
 function roundRect(g, x, y, w, h, r) { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); }
 
+// ---------- play along with a YouTube video ----------
+// A song with a "youtube" field ({id, start}) plays along with the official video: the video is the music,
+// and the song clock follows the video's own time. "start" is where beat 0 of the chord chart falls in the video.
+const YTV = { api: null, player: null, ready: false, id: null };
+const ytSong = () => !!(S.song && S.song.youtube && S.song.youtube.id);
+function ytLoadApi() {
+  if (YTV.api) return YTV.api;
+  YTV.api = new Promise(res => {
+    if (window.YT && window.YT.Player) return res();
+    const prev = window.onYouTubeIframeAPIReady;
+    window.onYouTubeIframeAPIReady = () => { prev && prev(); res(); };
+    const sc = document.createElement('script'); sc.src = 'https://www.youtube.com/iframe_api'; document.head.appendChild(sc);
+  });
+  return YTV.api;
+}
+async function ytShow() {
+  $('yt-panel').classList.toggle('hidden', !ytSong());
+  if (!ytSong()) { if (YTV.player && YTV.ready) YTV.player.pauseVideo(); return; }
+  const id = S.song.youtube.id;
+  await ytLoadApi();
+  if (YTV.player) { if (YTV.id !== id) { YTV.id = id; YTV.player.cueVideoById(id); } return; }
+  YTV.id = id;
+  YTV.player = new YT.Player('yt', {
+    videoId: id, playerVars: { rel: 0, playsinline: 1, modestbranding: 1, origin: location.origin },
+    events: {
+      onReady: () => { YTV.ready = true; ytRate(); },
+      onStateChange: e => { if (e.data === YT.PlayerState.ENDED && S.playing && ytSong()) finish(); },
+      onError: e => showMsg(e.data === 101 || e.data === 150 ? 'This video can only be played on YouTube' : 'Video error ' + e.data, 3000)
+    }
+  });
+}
+// The Tempo slider becomes the video's playback speed (YouTube offers fixed steps such as 0.5x, 0.75x, 1x).
+function ytRate() {
+  if (!ytSong() || !YTV.ready) return;
+  const want = S.tempo / (S.song.normalTempo || 100);
+  const rates = (YTV.player.getAvailablePlaybackRates?.() || [0.5, 0.75, 1]).filter(r => r <= 1);
+  const r = rates.reduce((a, b) => Math.abs(b - want) < Math.abs(a - want) ? b : a, 1);
+  if (YTV.player.getPlaybackRate() !== r) YTV.player.setPlaybackRate(r);
+  return r;
+}
+function ytStart() {
+  if (!ytSong() || !YTV.ready) return false;
+  const start = S.song.youtube.start || 0, bar = (S.song.beatsPerBar || 4) * 60 / (S.song.normalTempo || 100);
+  ytRate();
+  YTV.player.seekTo(Math.max(0, start - bar), true);   // a bar of the recording plays as the count-in
+  YTV.player.playVideo();
+  return true;
+}
+function ytStop() { if (YTV.player && YTV.ready) YTV.player.pauseVideo(); }
+// Keep the song clock on the video's clock (corrects drift, buffering and seeking).
+function ytSync() {
+  if (!ytSong() || !YTV.ready || !timed()) return;
+  const st = YTV.player.getPlayerState?.();
+  if (st !== YT.PlayerState.PLAYING) { S.t0 += 16; S.countInUntil = Math.max(S.countInUntil || 0, performance.now()); return; }   // hold while paused/buffering
+  const rate = YTV.player.getPlaybackRate() || 1;
+  const tempo = (S.song.normalTempo || 100) * rate;
+  if (Math.abs(S.tempo - tempo) > 0.01) { S.tempo = tempo; renderControls(); }
+  const beat = (YTV.player.getCurrentTime() - (S.song.youtube.start || 0)) * (S.song.normalTempo || 100) / 60;
+  const want = performance.now() - beat * beatMs();
+  if (Math.abs(want - S.t0) > 35) S.t0 = want;
+}
+
 function loop() {
+  ytSync();
   scheduleClicks();
   scheduleDemo();
   scheduleBand();
@@ -1484,6 +1550,7 @@ function validSong(s) { return s && Array.isArray(s.verses) && Array.isArray(s.l
 function useSong(song) {
   S.song = song;
   if (S.tempo > (song.normalTempo || 80)) S.tempo = song.normalTempo || 80;
+  if (song.youtube) S.tempo = song.normalTempo || 100;
   $('song-title').textContent = `${song.title} · ${song.artist || ''}`;
   $('song-credit').textContent = song.credit || '';
   const vp = $('verse-pick');
@@ -1492,6 +1559,7 @@ function useSong(song) {
   vp.value = String(S.verse);
   resetRun();
   applySongLayout();   // put this song's chords on the guitar's frets (if connected)
+  ytShow();
 }
 async function loadSongList() {
   try {

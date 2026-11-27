@@ -3,6 +3,12 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.8.0 — November 2026
+- **🎸 Rock out with YouTube:** songs can now play along with an official YouTube video. The video is the music; the song clock follows the video's own time, so the lit frets and chord chart stay in sync, and the Tempo slider sets the video's speed (YouTube's 0.75× / 0.5× steps).
+- **New song: Summer of '69** (Bryan Adams), with the official video. Seven chords: D, A, Bm, G and the bridge's F, B♭, C.
+- Song files can carry `"youtube": {"id", "start"}`; `start` is where beat 0 of the chord chart falls in the video.
+- With a video song the computer doesn't strum or play the band over the record. Follow me isn't available yet for video songs (use ▶ Listen or Fixed tempo).
+
 ## 1.7.0 — November 2026
 - **New song: Code Monkey** by Jonathan Coulton (Creative Commons BY-NC 3.0), with the Rock band. It's a song you sing yourself: words on screen, no AI singer. Four easy chords (C, F, G, Am).
 - Built-in songs can now be plain chord sheets (`.txt`): list them in `songs/index.json` as `{"sheet": "file.txt", "title", "band", "credit", ...}`.
