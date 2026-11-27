@@ -1,6 +1,6 @@
 # StrumAlong
 
-**Version 1.9.2** (November 2026) · see `CHANGELOG.md`
+**Version 1.9.3** (November 2026) · see `CHANGELOG.md`
 
 *Unofficial project, free and as-is: use at your own risk. See the [Disclaimer](#disclaimer) at the bottom.*
 
@@ -44,6 +44,8 @@
 - Built-in songs are traditional, public-domain tunes, plus **Code Monkey** by Jonathan Coulton, used under the [Creative Commons Attribution-NonCommercial 3.0](https://creativecommons.org/licenses/by-nc/3.0/) licence. Chord chart and band arrangement by StrumAlong; words added and reviewed by a human maintainer, with one word changed to keep it family-friendly. Not endorsed by Jonathan Coulton.
 - The song vocals are sung by **TIGER DS**, a free AI singing voice by tigermeat (licence CC BY-NC-ND 4.0 with Commons Clause: free for non-commercial use), rendered with **OpenUtau** (free, MIT licence). The vocal recordings (`songs/vocals/*.mp3`) are not covered by StrumAlong's MIT licence: share them only non-commercially, with this credit.
 
+**Privacy:** StrumAlong keeps your settings in your own browser and never records sound. Details: [Privacy & Terms](PRIVACY.md).
+
 ## Not affiliated
 
 StrumAlong is an independent project. It is not made by, endorsed by or affiliated with AeroBand
@@ -66,7 +68,9 @@ License: MIT (see `LICENSE`).
 > It is provided free and "as is", without warranty of any kind. It does not change the guitar's firmware, but it does change guitar settings
 > (mode, lights, Easy Chord layout). **Use it entirely at your own risk**; the authors accept no liability for any damage, malfunction,
 > voided warranty or other problem. These settings stay on the guitar after it is switched off; StrumAlong's **Chord reset** button (or the official AeroBand app) puts them back. "AeroBand" is a trademark of its owner,
-> used only to say which guitar this works with. **By using StrumAlong, you agree to these terms.** If you don't agree, don't use it.
+> used only to say which guitar this works with. Rock Out and the Listener use YouTube API Services (YouTube's embedded player): by using them you also agree to the
+> [YouTube Terms of Service](https://www.youtube.com/t/terms); see [Privacy & Terms](PRIVACY.md) and the [Google Privacy Policy](https://policies.google.com/privacy).
+> **By using StrumAlong, you agree to these terms.** If you don't agree, don't use it.
 
 ## Visits
 

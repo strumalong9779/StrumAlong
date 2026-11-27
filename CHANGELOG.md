@@ -3,6 +3,10 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.9.3 — November 2026
+- **Privacy & Terms:** new `PRIVACY.md` (what StrumAlong keeps, what YouTube and other services see), linked from the README.
+- Rock Out songs and the Listener now say that they use YouTube's player, with links to the YouTube Terms of Service and the privacy page, as YouTube's developer policies ask.
+
 ## 1.9.2 — November 2026
 - The play-along-with-the-record feature is now simply called **🎸 Rock Out**. It works the same way: it plays the artist's official video on YouTube, through YouTube's standard player, and StrumAlong adds the chords. Song menu: 🎧 Make a Rock Out song….
 

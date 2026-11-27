@@ -36,7 +36,8 @@
   #yt-panel { padding:10px; }
   #yt-box { position:relative; width:100%; max-width:640px; aspect-ratio:16/9; margin:0 auto; background:#000; border-radius:8px; overflow:hidden; }
   #yt-box iframe, #yt-box > div { position:absolute; inset:0; width:100%; height:100%; }
-  #yt-note { text-align:center; font-size:12px; color:#7d8597; margin-top:6px; }
+  #yt-note { text-align:center; font-size:12px; color:#7d8597; margin-top:6px; line-height:1.5; }
+  #yt-note a { color:#8fb4ff; }
 
   main { flex:1; display:grid; grid-template-columns: 1fr 330px; gap:16px; padding:16px 22px; min-height:0; }
   .panel { background:var(--panel); border-radius:12px; padding:14px 18px; }
@@ -201,7 +202,7 @@
 
     <div id="yt-panel" class="panel hidden">
       <div id="yt-box"><div id="yt"></div></div>
-      <div id="yt-note"><b>🎸 Rock Out</b> · plays along with the artist's official video on YouTube · use ▶ Listen or Fixed tempo · the Tempo slider slows it down</div>
+      <div id="yt-note"><b>🎸 Rock Out</b> · plays along with the artist's official video on YouTube · use ▶ Listen or Fixed tempo · the Tempo slider slows it down<br>Uses YouTube's player: by playing you agree to the <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener">YouTube Terms of Service</a> · <a href="https://github.com/strumalong9779/StrumAlong/blob/main/PRIVACY.md" target="_blank" rel="noopener">Privacy</a></div>
     </div>
 
     <div id="lane-wrap" class="panel" style="padding:10px">
