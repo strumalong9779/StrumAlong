@@ -1,9 +1,11 @@
 # StrumAlong
 
-**Version 1.11.0** (November 2026) · see `CHANGELOG.md`
+**Version 1.12.0** (November 2026) · see `CHANGELOG.md`
 
 *Unofficial project, free and as-is: use at your own risk. See the [Disclaimer](#disclaimer) at the bottom.*
 
+> **🥁 New in 1.12: no more tapping.** The Listener now finds the beat of a song by itself when it makes a Rock Out song, even on records that speed up and slow down. Tapping is still there if you want it.
+>
 > **🎸 New in 1.11: three more Rock Out songs.** Play along with **Let It Be** (The Beatles), **Against the Wind** (Bob Seger, with the words on screen in his official lyric video) and **You Belong With Me** (Taylor Swift), straight from the artists' own YouTube uploads.
 >
 > **🎤 New in 1.10: StrumAlong is now for everyone.** No AeroBand? No problem. Press **🎤 Any instrument** and play a real guitar, keyboard, ukulele or piano: StrumAlong listens through your computer's microphone, hears the chords you play and moves the song along. *Experimental: tell us how it works for you.*
@@ -20,7 +22,7 @@ It gets you playing real songs from your very first strum. It shows the chords a
 - Bring your own songs: drop a chord sheet (text or ChordPro) on the window.
 - **Jam with the band (new in 1.6):** drums and bass play along behind your strums (Folk, Country or Rock; each song picks a style), with a **Band** slider to mix them in.
 - **🎸 Rock Out:** play along with the real record. Pick **Summer of '69**, **Sweet Home Alabama**, **Let It Be**, **Against the Wind** or **You Belong With Me** and the artist's official video plays inside StrumAlong while the frets light up in time with it. The Tempo slider slows the video down (0.75× or 0.5×) for practice. Works with ▶ Listen and Fixed tempo; needs an internet connection. How Rock Out respects artists' rights is explained in plain English [at the end of this page](#rock-out-rights-and-permissions-in-plain-english).
-- **🎧 Make your own Rock Out songs (new in 1.9):** the StrumAlong Listener hears a YouTube song through your computer's microphone and writes down its chords. Tap the beat, check the chart, click to fix any chord, and add it to your song list. Nothing is ever recorded: a song keeps only chord names and their timing. Song menu → 🎧 Make a Rock Out song…
+- **🎧 Make your own Rock Out songs (new in 1.9):** the StrumAlong Listener hears a YouTube song through your computer's microphone and writes down its chords. It finds the beat by itself (new in 1.12; you can still tap it), then you check the chart, click to fix any chord, and add it to your song list. Nothing is ever recorded: a song keeps only chord names and their timing. Song menu → 🎧 Make a Rock Out song…
 - **Hear it sung:** the traditional songs (Kumbaya, Clementine, Oh! Susanna, Yankee Doodle and I've Been Working on the Railroad) come with a sung vocal (an AI singer) that sings along with the chords in Listen and Fixed tempo, so you can hear how the words fit the strums. A **Voice** slider sets the singer against the guitar.
 
 **Guides:** `docs/StrumAlong-Quick-Start.pdf` (first use, 2 pages), `docs/StrumAlong-User-Guide.pdf` (how to play) `docs/StrumAlong-Rock-Out-Guide.pdf` (play along with YouTube and make your own songs, 2 pages) and `docs/StrumAlong-Technical-Guide.pdf` (how it works, how to change it).

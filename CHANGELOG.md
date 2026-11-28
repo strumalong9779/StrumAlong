@@ -3,6 +3,10 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.12.0 — November 2026
+- **The Listener finds the beat by itself.** When it has heard a song, it works out the tempo from the recording (where the sound jumps, then the steady tick that fits those jumps best) and places every beat. Steady records get one tempo; records that speed up and slow down get a beat-by-beat timing map, so the chart follows the band. **×2** and **÷2** fix a tempo heard at half or double speed. Tapping is still there and, if you tap, your taps win.
+- It analyses the artist's recording once, to build the song file; nothing listens to or scores the player.
+
 ## 1.11.0 — November 2026
 - **Three more 🎸 Rock Out songs:** **Let It Be** (The Beatles), **Against the Wind** (Bob Seger & The Silver Bullet Band) and **You Belong With Me** (Taylor Swift). Each plays the artist's own YouTube upload; Against the Wind uses Bob Seger's official lyric video, so the words are on screen in the artist's own video. As always, StrumAlong ships only chord names and their timing.
 - **Rock Out follows records that speed up and slow down.** A Rock Out song can now carry a beat-by-beat timing map, so the chords stay with bands that played without a click track (Let It Be drifts from about 72 to 68 BPM). Add-on only: songs without a map work exactly as before.
