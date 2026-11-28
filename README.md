@@ -1,6 +1,6 @@
 # StrumAlong
 
-**Version 1.12.0** (November 2026) · see `CHANGELOG.md`
+**Version 1.12.1** (November 2026) · see `CHANGELOG.md`
 
 *Unofficial project, free and as-is: use at your own risk. See the [Disclaimer](#disclaimer) at the bottom.*
 

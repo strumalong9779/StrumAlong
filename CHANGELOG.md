@@ -3,6 +3,9 @@
 Version numbers: MAJOR.MINOR.PATCH. Bump PATCH for fixes, MINOR for new features, MAJOR for big changes.
 The app shows its version next to its name; update `APP_VERSION` in `app.js` and this file together.
 
+## 1.12.1 — November 2026
+- Docs only: the README credits and the Technical Guide's new **Published methods** section name the published research StrumAlong's audio analysis follows (Scheirer 1998, Ellis 2007, Klapuri 2003).
+
 ## 1.12.0 — November 2026
 - **The Listener finds the beat by itself.** When it has heard a song, it works out the tempo from the recording (where the sound jumps, then the steady tick that fits those jumps best) and places every beat. Steady records get one tempo; records that speed up and slow down get a beat-by-beat timing map, so the chart follows the band. **×2** and **÷2** fix a tempo heard at half or double speed. Tapping is still there and, if you tap, your taps win.
 - It analyses the artist's recording once, to build the song file; nothing listens to or scores the player.
