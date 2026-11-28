@@ -50,6 +50,7 @@ It gets you playing real songs from your very first strum. It shows the chords a
 - Guitar and bass sounds: FluidR3_GM soundfont by Frank Wen, CC BY 3.0, served by gleitz/midi-js-soundfonts. Drums are synthesized in the browser.
 - **Rock Out** songs play the artist's own official video through YouTube's standard player; StrumAlong stores only the chord names and their timing, worked out by ear. No recording is copied or hosted here.
 - Built-in songs are traditional, public-domain tunes.
+- The Listener's beat finding follows published research: tempo by comb filtering (E. Scheirer, *Tempo and beat analysis of acoustic musical signals*, 1998) and beat tracking by dynamic programming (D. Ellis, *Beat Tracking by Dynamic Programming*, 2007). 🎤 Any instrument hears chords with the method of A. Klapuri (*Multiple fundamental frequency estimation based on harmonicity and spectral smoothness*, 2003).
 - The song vocals are sung by **TIGER DS**, a free AI singing voice by tigermeat (licence CC BY-NC-ND 4.0 with Commons Clause: free for non-commercial use), rendered with **OpenUtau** (free, MIT licence). The vocal recordings (`songs/vocals/*.mp3`) are not covered by StrumAlong's MIT licence: share them only non-commercially, with this credit.
 
 **Privacy:** StrumAlong keeps your settings in your own browser and never records sound. Details: [Privacy & Terms](PRIVACY.md).
