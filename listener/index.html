@@ -84,8 +84,11 @@
     </div></div>
 
     <div class="step" id="s2"><div class="n">2</div><div class="t">
-      <b>Tap the beat.</b> Press <b>Tap along</b> and tap the big button (or the <span class="kbd">Space</span> bar) on every beat for about 15 seconds, like tapping your foot. This sets the tempo and the bar lines.
+      <b>The beat.</b> When step 1 finishes, the Listener finds the tempo by itself. If the BPM looks half or double what you hear, press <b>×2</b> or <b>÷2</b>. Or tap it yourself: press <b>Tap along</b> and tap the big button (or the <span class="kbd">Space</span> bar) on every beat for about 15 seconds; taps win over the automatic beat.
       <div class="row" style="margin-top:6px">
+        <span id="autoinfo" class="note"></span>
+        <button id="dbl" disabled title="Double the tempo">×2</button>
+        <button id="hlf" disabled title="Halve the tempo">÷2</button>
         <button id="tapgo" disabled>👆 Tap along</button>
         <span id="tapinfo" class="note"></span>
       </div>
@@ -160,7 +163,7 @@ $('load').onclick = () => {
   const id = videoIdFrom($('url').value);
   if (!id) return status($('status'), 'That doesn\'t look like a YouTube link.', 'err');
   if (!playerReady) return status($('status'), 'The YouTube player is still loading; try again in a second.', 'warn');
-  if (L.videoId !== id) { L.frames = []; L.taps = []; L.done = false; }
+  if (L.videoId !== id) { L.frames = []; L.taps = []; L.done = false; L.auto = null; $('autoinfo').textContent = ''; $('dbl').disabled = $('hlf').disabled = true; }
   L.videoId = id; song = null; $('chart').style.display = 'none';
   if (player) { player.cueVideoById(id); setTimeout(onVideo, 800); return; }
   player = new YT.Player('player', {
@@ -180,6 +183,7 @@ function onVideo() {
   status($('status'), L.done ? 'Video ready. An earlier listen of this song was found: you can go straight to step 2 or 3.' : 'Video ready.', 'ok');
   $('start').disabled = false; $('tapgo').disabled = false; updateMake();
   if (L.done) document.getElementById('s1').classList.add('done');
+  if (L.done && !L.auto && L.frames.length > 200) runAuto();   // an earlier listen from before the automatic beat
 }
 const vt = () => player && player.getCurrentTime ? player.getCurrentTime() : 0;
 
@@ -237,6 +241,7 @@ function finishListen(msg) {
   $('start').disabled = false; $('stop').disabled = true; $('tapgo').disabled = false;
   document.getElementById('s1').classList.add('done');
   status($('status'), msg + ` Heard ${fmt(L.frames.length ? L.frames[L.frames.length - 1].t : 0)} of music.`, 'ok');
+  runAuto();
   updateMake();
 }
 
@@ -265,6 +270,80 @@ function finishTap() {
   try { localStorage.setItem('listener.last', JSON.stringify(L)); } catch {}
   updateMake();
 }
+// ---------- automatic beat: the Listener finds the tempo from what it heard ----------
+// 1) onset strength: how suddenly the sound jumps (spectral flux), on a 50 Hz grid
+// 2) tempo: the steady tick (55-190 BPM) that lands on the most onsets (a comb filter)
+// 3) beats: a beat tracker places each beat, so records without a click track stay in step
+// It only analyses the recording, once; nothing listens to or scores the player.
+const ADT = 0.02;
+function onsetEnv(F) {
+  const T = F.map(f => f.t), X = F.map(f => f.f || 0);
+  const O = X.map((x, i) => { let s = 0, n = 0; for (let j = Math.max(0, i - 10); j <= Math.min(X.length - 1, i + 10); j++) { s += X[j]; n++; } return Math.max(0, x - s / n); });
+  const t0 = T[0], N = Math.max(0, Math.floor((T[T.length - 1] - t0) / ADT)), A = new Float64Array(N);
+  let j = 0, mx = 0;
+  for (let i = 0; i < N; i++) {
+    const t = t0 + i * ADT; while (j < T.length - 2 && T[j + 1] <= t) j++;
+    const w = (t - T[j]) / ((T[j + 1] - T[j]) || 1); A[i] = O[j] * (1 - w) + O[j + 1] * w; if (A[i] > mx) mx = A[i];
+  }
+  if (mx > 0) for (let i = 0; i < N; i++) A[i] /= mx;
+  return { A, t0 };
+}
+function combScore(A, bpm, from, to) {
+  const P = 60 / bpm / ADT; let best = 0, bph = 0;
+  for (let k = 0; k < 24; k++) {
+    const ph = k * P / 24; let s = 0, n = 0;
+    for (let x = from + ph; x < to - 1; x += P) { const i = Math.floor(x), w = x - i; s += A[i] * (1 - w) + A[i + 1] * w; n++; }
+    if (n && s / n > best) { best = s / n; bph = ph; }
+  }
+  return { s: best, ph: bph };
+}
+function findTempo(A) {
+  const from = Math.min(A.length - 1, Math.round(3 / ADT)), to = A.length - Math.round(2 / ADT);
+  let best = { s: -1, bpm: 100 };
+  for (let b = 55; b <= 190; b += 0.25) { const r = combScore(A, b, from, to); if (r.s > best.s) best = { s: r.s, bpm: b }; }
+  for (let b = best.bpm - 0.3; b <= best.bpm + 0.3; b += 0.01) { const r = combScore(A, b, from, to); if (r.s > best.s) best = { s: r.s, bpm: b }; }
+  // half/double: a slow song is often heard at half its pulse; prefer the faster pulse when it is nearly as strong
+  if (best.bpm < 72) { const r = combScore(A, best.bpm * 2, from, to); if (r.s >= 0.75 * best.s) best = { s: r.s, bpm: best.bpm * 2 }; }
+  else if (best.bpm > 165) { const r = combScore(A, best.bpm / 2, from, to); if (r.s >= 0.9 * best.s) best = { s: r.s, bpm: best.bpm / 2 }; }
+  return best.bpm;
+}
+function trackBeats(A, t0, bpm) {
+  const N = A.length, P = 60 / bpm / ADT, alpha = 60, sc = new Float64Array(N), bk = new Int32Array(N).fill(-1);
+  for (let i = 0; i < N; i++) {
+    let best = 0, bi = -1;
+    for (let j = Math.max(0, Math.round(i - 1.35 * P)); j <= Math.round(i - 0.7 * P); j++) { const v = sc[j] - alpha * Math.log((i - j) / P) ** 2; if (bi < 0 || v > best) { best = v; bi = j; } }
+    sc[i] = A[i] + (bi >= 0 ? Math.max(0, best) : 0); bk[i] = (bi >= 0 && best > 0) ? bi : -1;
+  }
+  let i = 0, b = -1e9; for (let k = Math.max(0, N - Math.round(2 * P)); k < N; k++) if (sc[k] > b) { b = sc[k]; i = k; }
+  const beats = []; while (i >= 0) { beats.unshift(+(t0 + i * ADT).toFixed(3)); i = bk[i]; }
+  return beats;
+}
+// a steady record gets one tempo; a record that drifts (no click track) keeps every beat as a timing map
+function autoGrid(bpm) {
+  const F = L.frames; if (!F || F.length < 200) return null;
+  const { A, t0 } = onsetEnv(F); if (A.length < 500) return null;
+  bpm = bpm || findTempo(A);
+  const beats = trackBeats(A, t0, bpm); if (beats.length < 16) return null;
+  const n = beats.length, mx = (n - 1) / 2, my = beats.reduce((a, x) => a + x, 0) / n;
+  let sxy = 0, sxx = 0, worst = 0; beats.forEach((y, x) => { sxy += (x - mx) * (y - my); sxx += (x - mx) ** 2; });
+  const beat = sxy / sxx, phase = my - beat * mx;
+  beats.forEach((y, x) => { worst = Math.max(worst, Math.abs(y - (phase + beat * x))); });
+  const drifts = worst > beat * 0.2;              // off a steady grid by more than a fifth of a beat somewhere
+  return { beat, bpm: 60 / beat, phase, beats: drifts ? beats : null, auto: true };
+}
+function runAuto(bpm) {
+  const g = autoGrid(bpm); L.auto = g;
+  $('dbl').disabled = $('hlf').disabled = !g;
+  $('autoinfo').textContent = g ? `Found the beat: ${g.bpm.toFixed(1)} BPM${g.beats ? ' (this record speeds up and slows down; the chart follows it)' : ''}` : '';
+  if (g) document.getElementById('s2').classList.add('done');
+  try { localStorage.setItem('listener.last', JSON.stringify(L)); } catch {}
+  updateMake();
+}
+$('dbl').onclick = () => { if (L.auto) { L.taps = []; $('tapinfo').textContent = ''; runAuto(L.auto.bpm * 2); } };
+$('hlf').onclick = () => { if (L.auto) { L.taps = []; $('tapinfo').textContent = ''; runAuto(L.auto.bpm / 2); } };
+// the grid used for the chart: your taps if you tapped, otherwise the automatic beat
+function beatGrid() { return tapGrid() || L.auto || null; }
+
 // least-squares beat grid from the taps (ignores a stray double-tap or a missed beat)
 function tapGrid() {
   const t = L.taps.slice().sort((a, b) => a - b); if (t.length < 8) return null;
@@ -277,7 +356,7 @@ function tapGrid() {
   const beat = sxy / sxx; if (!(beat > 0.25 && beat < 1.5)) return null;
   return { beat, bpm: 60 / beat, phase: my - beat * mx };   // phase = time of a beat
 }
-function updateMake() { const ok = L.done && L.frames.length > 200, g = tapGrid(); $('make').disabled = !(ok && g); $('makeinfo').textContent = !ok ? '' : (g ? '' : 'Tap the beat first (step 2).'); }
+function updateMake() { const ok = L.done && L.frames.length > 200, g = beatGrid(); $('make').disabled = !(ok && g); $('makeinfo').textContent = !ok ? '' : (g ? '' : 'No beat yet: tap it in step 2.'); }
 
 // ---------- step 3: work out the chart ----------
 function scoreRow(c, b, set) {
@@ -300,11 +379,19 @@ function chooseVocab(F) {
   const total = Object.values(dur).reduce((a, x) => a + x, 0);
   return Object.entries(dur).filter(([, x]) => x / total > 0.025).sort((a, b) => b[1] - a[1]).slice(0, 7).map(([n]) => n);
 }
-function cells(F, set, beat, phase) {
-  const half = beat * 2, end = F[F.length - 1].t, out = [];
+// cell start times: every two beats, either on a steady grid or along the beat map
+function bounds(g, off) {
+  const end = L.frames[L.frames.length - 1].t, out = [];
+  if (g.beats) { for (let k = off; k + 2 < g.beats.length; k += 2) out.push([g.beats[k], g.beats[k + 2]]); return out; }
+  const half = g.beat * 2; let t = g.phase + off * g.beat; while (t - half > 0) t -= half;
+  for (; t < end - half / 2; t += half) out.push([t, t + half]);
+  return out;
+}
+function cells(F, set, B) {
+  const out = [];
   const E = F.map(f => f.e).sort((a, b) => a - b), thr = E[Math.floor(E.length * 0.2)] * 0.5;
   let fi = 0;
-  for (let t = phase; t < end - half / 2; t += half) {
+  for (const [t, tEnd] of B) { const half = tEnd - t;
     const c = new Array(12).fill(0), b = new Array(12).fill(0); let e = 0, n = 0;
     while (fi < F.length && F[fi].t < t + 0.12) fi++;
     for (let j = fi; j < F.length && F[j].t < t + half + 0.12; j++) { F[j].c.forEach((x, k) => c[k] += x); F[j].b.forEach((x, k) => b[k] += x); e += F[j].e; n++; }
@@ -320,23 +407,21 @@ $('make').onclick = () => {
   status($('makeinfo'), 'Working…');
   setTimeout(() => {
     const names = chooseVocab(F), set = names.map(tmpl);
-    const g = tapGrid(); if (!g) { status($('makeinfo'), 'Tap the beat first (step 2).', 'warn'); return; }
-    const half = g.beat * 2;
+    const g = beatGrid(); if (!g) { status($('makeinfo'), 'No beat yet: tap it in step 2.', 'warn'); return; }
     // which beat starts a half-bar? try both, keep the one where chords sit best
     let best = null;
     for (const off of [0, 1]) {
-      let ph = g.phase + off * g.beat; while (ph - half > 0) ph -= half;
-      const cs = cells(F, set, g.beat, ph), tot = cs.reduce((a, x) => a + x.s, 0);
-      if (!best || tot > best.tot) best = { tot, cs, ph };
+      const B = bounds(g, off), cs = cells(F, set, B), tot = cs.reduce((a, x) => a + x.s, 0) / (cs.length || 1);
+      if (!best || tot > best.tot) best = { tot, cs, B };
     }
     // drop "ghost" chords: a chord stays only if taking it away makes the chart fit clearly worse
     // (Am / Em often show up as near-twins of C / G)
-    let vocab = names.slice(), ph = best.ph;
+    let vocab = names.slice(); const B = best.B;
     for (;;) {
       if (vocab.length <= 2) break;
-      const base = cells(F, vocab.map(tmpl), g.beat, ph); let weakest = null;
+      const base = cells(F, vocab.map(tmpl), B); let weakest = null;
       for (const x of vocab) {
-        const rest = vocab.filter(y => y !== x), alt = cells(F, rest.map(tmpl), g.beat, ph);
+        const rest = vocab.filter(y => y !== x), alt = cells(F, rest.map(tmpl), B);
         let n = 0, loss = 0, own = 0, other = 0; const r = tmpl(x).root;
         base.forEach((b, i) => { if (b.ch === x) { n++; loss += b.s - alt[i].s; if (b.b) { own += b.b[r]; other += b.b[tmpl(alt[i].ch === 'N' ? x : alt[i].ch).root]; } } });
         // a real chord has its own root in the bass (C over a C bass); a ghost borrows its twin's (Am over C)
@@ -347,20 +432,24 @@ $('make').onclick = () => {
       if (!weakest || weakest.avg >= 0.06) break;
       vocab = vocab.filter(y => y !== weakest.x);
     }
-    let cs = cells(F, vocab.map(tmpl), g.beat, ph);
+    let cs = cells(F, vocab.map(tmpl), B);
     // remove one-cell flickers that sit between two cells of the same chord when the call was close
     for (let i = 1; i < cs.length - 1; i++) if (cs[i].ch !== cs[i - 1].ch && cs[i - 1].ch === cs[i + 1].ch && cs[i].m < 0.04) cs[i].ch = cs[i - 1].ch;
     // carry a chord through short silences inside the song; trim silence at both ends
     let first = cs.findIndex(x => x.ch !== 'N'); let last = cs.length - 1; while (last > 0 && cs[last].ch === 'N') last--;
-    cs = cs.slice(first, last + 1); for (let i = 1; i < cs.length; i++) if (cs[i].ch === 'N') cs[i].ch = cs[i - 1].ch;
+    cs = cs.slice(first, last + 1);
+    // a drifting record keeps its beat map from the first cell on (two map beats per cell)
+    let map = null;
+    if (g.beats) { const k0 = g.beats.indexOf(cs[0].t); if (k0 >= 0) map = g.beats.slice(k0, k0 + cs.length * 2 + 1); } for (let i = 1; i < cs.length; i++) if (cs[i].ch === 'N') cs[i].ch = cs[i - 1].ch;
     // line up the chart in four-bar lines, starting on a bar where possible
-    song = { title: '', artist: '', normalTempo: +(60 / g.beat).toFixed(1), beatsPerBar: 4, cellBeats: 2,
-             youtube: { id: L.videoId, start: +cs[0].t.toFixed(3) }, band: 'off', verses: [{ name: 'Whole song' }],
+    const avgBeat = map ? (map[map.length - 1] - map[0]) / (map.length - 1) : g.beat;
+    song = { title: '', artist: '', normalTempo: +(60 / avgBeat).toFixed(1), beatsPerBar: 4, cellBeats: 2,
+             youtube: map ? { id: L.videoId, start: +cs[0].t.toFixed(3), beats: map } : { id: L.videoId, start: +cs[0].t.toFixed(3) }, band: 'off', verses: [{ name: 'Whole song' }],
              cells: cs.map(x => x.ch), times: cs.map(x => x.t), edited: [], vocab };
     drawChart();
     $('chart').style.display = 'block';
     document.getElementById('s3').classList.add('done');
-    status($('makeinfo'), `${vocab.length} chords · ${song.normalTempo} BPM. Check it by ear, fix any chord, then add it.`, 'ok');
+    status($('makeinfo'), `${vocab.length} chords · ${song.normalTempo} BPM${map ? ' (follows the record’s own timing)' : ''}${g.auto ? ' · beat found automatically' : ' · beat from your taps'}. Check it by ear, fix any chord, then add it.`, 'ok');
   }, 30);
 };
 function drawChart() {
@@ -427,7 +516,7 @@ $('save').onclick = () => {
 };
 
 // pick up an earlier listen (e.g. after a reload)
-try { const old = JSON.parse(localStorage.getItem('listener.last') || 'null'); if (old && old.frames && old.frames.length) { Object.assign(L, old); L.taps = old.taps || []; if (L.videoId) $('url').value = 'https://www.youtube.com/watch?v=' + L.videoId; } } catch {}
+try { const old = JSON.parse(localStorage.getItem('listener.last') || 'null'); if (old && old.frames && old.frames.length) { Object.assign(L, old); L.taps = old.taps || []; if (L.auto) { $('dbl').disabled = $('hlf').disabled = false; $('autoinfo').textContent = `Found the beat: ${L.auto.bpm.toFixed(1)} BPM`; } if (L.videoId) $('url').value = 'https://www.youtube.com/watch?v=' + L.videoId; } } catch {}
 </script>
 </body>
 </html>
